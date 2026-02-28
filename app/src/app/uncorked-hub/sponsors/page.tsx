@@ -1174,6 +1174,22 @@ function SponsorPipelineView({
 // Table (List) View
 // ============================================
 
+function SponsorSortHeader({ field, label, sortField, sortDirection, onSort }: { field: string; label: string; sortField: string; sortDirection: "asc" | "desc"; onSort: (field: string) => void }) {
+  return (
+    <th
+      className="px-4 py-3 text-left text-[10px] uppercase tracking-wider font-semibold text-gray-500 cursor-pointer hover:text-wine-600 select-none"
+      onClick={() => onSort(field)}
+    >
+      <span className="inline-flex items-center gap-1">
+        {label}
+        {sortField === field && (
+          <span className="text-wine-600">{sortDirection === "asc" ? "\u2191" : "\u2193"}</span>
+        )}
+      </span>
+    </th>
+  );
+}
+
 function SponsorListView({
   sponsors,
   sortField,
@@ -1197,20 +1213,6 @@ function SponsorListView({
     return <EmptyState message="No sponsors match your filters. Try adjusting your search or filters." />;
   }
 
-  const SortHeader = ({ field, label }: { field: string; label: string }) => (
-    <th
-      className="px-4 py-3 text-left text-[10px] uppercase tracking-wider font-semibold text-gray-500 cursor-pointer hover:text-wine-600 select-none"
-      onClick={() => onSort(field)}
-    >
-      <span className="inline-flex items-center gap-1">
-        {label}
-        {sortField === field && (
-          <span className="text-wine-600">{sortDirection === "asc" ? "\u2191" : "\u2193"}</span>
-        )}
-      </span>
-    </th>
-  );
-
   return (
     <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
@@ -1218,13 +1220,13 @@ function SponsorListView({
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
               <th className="w-10 px-4 py-3" />
-              <SortHeader field="company" label="Company" />
-              <SortHeader field="tier" label="Tier" />
-              <SortHeader field="status" label="Status" />
-              <SortHeader field="years" label="Years" />
-              <SortHeader field="assignedTo" label="Assigned To" />
+              <SponsorSortHeader field="company" label="Company" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
+              <SponsorSortHeader field="tier" label="Tier" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
+              <SponsorSortHeader field="status" label="Status" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
+              <SponsorSortHeader field="years" label="Years" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
+              <SponsorSortHeader field="assignedTo" label="Assigned To" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
               <th className="px-4 py-3 text-left text-[10px] uppercase tracking-wider font-semibold text-gray-500">Contact Info</th>
-              <SortHeader field="lastActivity" label="Last Activity" />
+              <SponsorSortHeader field="lastActivity" label="Last Activity" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">

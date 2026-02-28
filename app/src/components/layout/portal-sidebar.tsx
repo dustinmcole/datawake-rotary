@@ -36,15 +36,16 @@ export function PortalSidebar() {
   const pathname = usePathname();
   const { user } = useUser();
   const [open, setOpen] = useState(false);
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (lastPathname !== pathname) {
+    setLastPathname(pathname);
+    if (open) setOpen(false);
+  }
 
   const roles = (user?.publicMetadata?.roles as string[]) ?? [];
   const showAdmin = roles.some((r) => ["super_admin", "club_admin", "board_member", "website_admin"].includes(r));
   const showUncorked = roles.some((r) => ["super_admin", "club_admin", "uncorked_committee"].includes(r));
   const showCheckin = roles.some((r) => ["super_admin", "club_admin", "board_member", "checkin_operator"].includes(r));
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

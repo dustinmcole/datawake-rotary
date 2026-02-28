@@ -587,7 +587,13 @@ export default function MemberManagementPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    fetch("/api/admin/members")
+      .then((r) => r.json())
+      .then((data) => setMembers(Array.isArray(data) ? data : []))
+      .catch(() => setMembers([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = useMemo(() => {
     let list = members;

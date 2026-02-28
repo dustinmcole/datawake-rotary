@@ -60,7 +60,17 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    fetch("/api/admin/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        setStats(data.stats ?? null);
+        setRecentAnnouncements(data.recentAnnouncements ?? []);
+        setRecentMembers(data.recentMembers ?? []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const statCards = [
     {

@@ -421,8 +421,7 @@ export default function TasksPage() {
   // Kanban Board
   // -----------------------------------------------------------------------
 
-  function KanbanBoard() {
-    return (
+  const kanbanBoard = (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {STATUSES.map((status) => {
           const col = COLUMN_COLORS[status];
@@ -476,40 +475,38 @@ export default function TasksPage() {
           );
         })}
       </div>
-    );
-  }
+  );
 
   // -----------------------------------------------------------------------
   // List View
   // -----------------------------------------------------------------------
 
-  function ListView() {
-    function SortHeader({ field, children }: { field: typeof sortField; children: React.ReactNode }) {
-      const active = sortField === field;
-      return (
-        <button
-          onClick={() => toggleSort(field)}
-          className={cn(
-            "flex items-center gap-1 text-xs font-semibold uppercase tracking-wider",
-            active ? "text-wine-700" : "text-gray-400 hover:text-gray-600"
-          )}
-        >
-          {children}
-          {active && <span className="text-wine-500">{sortDir === "asc" ? "\u2191" : "\u2193"}</span>}
-        </button>
-      );
-    }
-
+  const taskSortHeader = (field: typeof sortField, children: React.ReactNode) => {
+    const active = sortField === field;
     return (
+      <button
+        onClick={() => toggleSort(field)}
+        className={cn(
+          "flex items-center gap-1 text-xs font-semibold uppercase tracking-wider",
+          active ? "text-wine-700" : "text-gray-400 hover:text-gray-600"
+        )}
+      >
+        {children}
+        {active && <span className="text-wine-500">{sortDir === "asc" ? "\u2191" : "\u2193"}</span>}
+      </button>
+    );
+  };
+
+  const listView = (
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         {/* Table Header */}
         <div className="grid grid-cols-[1fr_100px_110px_120px_120px_100px_40px] gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50/80">
-          <SortHeader field="title">Task</SortHeader>
-          <SortHeader field="status">Status</SortHeader>
-          <SortHeader field="priority">Priority</SortHeader>
+          {taskSortHeader("title", "Task")}
+          {taskSortHeader("status", "Status")}
+          {taskSortHeader("priority", "Priority")}
           <div className="text-xs font-semibold uppercase tracking-wider text-gray-400">Category</div>
           <div className="text-xs font-semibold uppercase tracking-wider text-gray-400">Assignee</div>
-          <SortHeader field="dueDate">Due</SortHeader>
+          {taskSortHeader("dueDate", "Due")}
           <div />
         </div>
 
@@ -565,8 +562,7 @@ export default function TasksPage() {
           })
         )}
       </div>
-    );
-  }
+  );
 
   // -----------------------------------------------------------------------
   // Main Render
@@ -737,7 +733,7 @@ export default function TasksPage() {
         </div>
       ) : (
         <>
-          {view === "kanban" ? <KanbanBoard /> : <ListView />}
+          {view === "kanban" ? kanbanBoard : listView}
         </>
       )}
 

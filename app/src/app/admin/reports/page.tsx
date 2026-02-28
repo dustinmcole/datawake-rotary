@@ -57,7 +57,6 @@ export default function ReportsPage() {
   const [memberTypes, setMemberTypes] = useState(MEMBER_TYPE_DATA);
 
   useEffect(() => {
-    setLoading(true);
     Promise.all([
       fetch("/api/admin/stats").then((r) => r.json()),
       fetch("/api/admin/members").then((r) => r.json()),

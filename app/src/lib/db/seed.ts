@@ -38,7 +38,6 @@ const vid = () => `seed_v_${_id++}`;
 // ---------------------------------------------------------------------------
 
 type ContactRow = typeof schema.contacts.$inferInsert;
-type ActivityRow = typeof schema.activities.$inferInsert;
 
 function makeContact(partial: Partial<ContactRow> & { id: string; name: string; type: string }): ContactRow {
   return {

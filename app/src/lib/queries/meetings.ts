@@ -1,7 +1,7 @@
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { meetings, actionItems } from "@/lib/db/schema";
-import type { Meeting, ActionItem } from "@/lib/types";
+import type { Meeting } from "@/lib/types";
 
 function parseJson<T>(val: string | null | undefined, fallback: T): T {
   try {

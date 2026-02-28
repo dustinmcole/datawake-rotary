@@ -116,7 +116,17 @@ export default function PlatformAnalyticsTab() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetch("/api/admin/stats")
+      .then((res) => res.json())
+      .then((d) => setAdminStats(d as AdminStats))
+      .catch(() => setAdminStats(null))
+      .finally(() => setLoadingAdmin(false));
+
+    fetch("/api/admin/planning/db-stats")
+      .then((res) => res.json())
+      .then((d) => setDbStats(d as DbStats))
+      .catch(() => setDbStats(null))
+      .finally(() => setLoadingDb(false));
   }, []);
 
   const handleRefresh = () => {

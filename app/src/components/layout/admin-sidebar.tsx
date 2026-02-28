@@ -37,10 +37,11 @@ const navItems = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (lastPathname !== pathname) {
+    setLastPathname(pathname);
+    if (open) setOpen(false);
+  }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

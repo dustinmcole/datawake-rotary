@@ -183,7 +183,13 @@ export default function AnnouncementsManagementPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    fetch("/api/admin/announcements")
+      .then((r) => r.json())
+      .then((data) => setAnnouncements(Array.isArray(data) ? data : []))
+      .catch(() => setAnnouncements([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function togglePin(a: Announcement) {
     await fetch(`/api/admin/announcements/${a.id}`, {

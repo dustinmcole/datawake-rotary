@@ -157,16 +157,27 @@ export default function CommitteeManagementPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/admin/committees").then((r) => r.json()),
+      fetch("/api/admin/members").then((r) => r.json()),
+    ])
+      .then(([comms, mems]) => {
+        setCommittees(Array.isArray(comms) ? comms : []);
+        setMembers(Array.isArray(mems) ? mems : []);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
-    if (!selected) { setCommitteeMembers([]); return; }
-    setLoadingMembers(true);
+    if (!selected) return;
+    let cancelled = false;
     fetch(`/api/admin/committees/${selected.id}?members=true`)
       .then((r) => r.json())
-      .then((data) => setCommitteeMembers(data.members ?? []))
-      .catch(() => setCommitteeMembers([]))
-      .finally(() => setLoadingMembers(false));
+      .then((data) => { if (!cancelled) setCommitteeMembers(data.members ?? []); })
+      .catch(() => { if (!cancelled) setCommitteeMembers([]); });
+    return () => { cancelled = true; };
   }, [selected]);
 
   async function addMember() {
@@ -212,7 +223,7 @@ export default function CommitteeManagementPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ active: false }),
       });
-      if (selected?.id === id) setSelected(null);
+      if (selected?.id === id) { setSelected(null); setCommitteeMembers([]); }
       load();
     } catch {
       // silently fail
