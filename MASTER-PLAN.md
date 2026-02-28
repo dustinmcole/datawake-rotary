@@ -1393,7 +1393,8 @@ The Planning Hub (`/admin/planning`) is a super_admin-only command center with 6
 | 2026-02-28 | Terminal 4A+4B: Bryn AI Assistant (backend + chat UI) | Done |
 | 2026-02-28 | Roger developer agent + Planning Hub — 6-tab admin command center, 5 Roger tools, streaming chat | Done |
 | 2026-02-28 | Planned feature sets added: SMS Broadcast, Community CRM, Membership Pipeline, Board Portal | Planned |
-| 2026-02-28 | iPad Kiosk Check-In — built and deployed (Section 16E) | Done |
+| 2026-02-28 | iPad Kiosk Check-In — built (Section 16E): checkin_sessions table, kiosk + monitor pages, 5 API routes | Done |
+| 2026-02-28 | Check-In refactored: Clerk auth replaces PIN, monitor moved to /portal/checkin, checkin_operator role added | Done |
 | 2026-02-28 | Constant Contact integration logged — Section 16F | Planned |
 | 2026-02-28 | Public website redesign — new hero, gear logo, nonprofit spotlight, events grid | Done |
 | 2026-02-28 | Custom domain rotary.datawake.io — Vercel + Cloudflare A record | Done |
@@ -1497,56 +1498,29 @@ These feature sets are planned but not yet built. Each will become one or more f
 ### 16E. iPad Kiosk Attendance Check-In
 
 **Status:** Built — complete
-**Primary routes:** `/checkin` (kiosk) + `/checkin/monitor` (live view)
+**Primary routes:** `/checkin` (kiosk, full-screen) + `/portal/checkin` (monitor, in portal)
 **New tables:** `checkin_sessions`
+**New role:** `checkin_operator`
 **Reuses:** existing `attendance` table
 
-#### Overview
-
-A kiosk-mode check-in experience designed to run on an iPad at the weekly lunch. Members walk up, type their name, and confirm. A separate monitor view (on a laptop or second screen) shows attendees appearing in real-time as people check in.
-
-#### Two views
+#### Two views (as built)
 
 **Kiosk view (`/checkin`):**
-- No standard site chrome — full screen, clean, tablet-optimized
-- Large text input: "Type your name to check in"
-- Fuzzy search against member list as you type — shows matching members below input
-- Tap a match to confirm: shows their name + photo + "Welcome, John!" success screen for 3 seconds, then resets
-- If no match: "Not found — see the host" message (doesn't block, prevents ghost entries)
-- Guest/visitor mode: if name not in system, can check in as "guest" (recorded separately)
-- Protected by a **session PIN** set when the admin opens the check-in session — not full Clerk auth, so the iPad can stay locked on this page all lunch
+- `(kiosk)` route group — full-screen, no portal chrome
+- **Clerk-auth required** (`checkin_operator`, `board_member`, `club_admin`, `super_admin`) — iPad stays logged into a dedicated account, no PIN needed
+- Large name input → 300ms debounced fuzzy search → tap member card → full-screen green "Welcome!" overlay (2.5s) → auto-reset
+- Polls `/api/checkin/session` every 15s — shows "Check-in is not open yet" if no active session
 
-**Monitor view (`/checkin/monitor`):**
-- Requires Clerk auth (`club_admin` or `super_admin`)
-- Split layout:
-  - Left: large running list of who has checked in today (photo + name + time), newest at top
-  - Right: manual entry panel — admin can search and check in a member manually (same fuzzy search)
-- Real-time updates: new check-ins appear automatically (SSE stream or polling every 5s)
-- Session controls: "Open Session" (sets meeting date + PIN), "Close Session"
-- Total count badge (e.g., "47 checked in")
-- Export current list to CSV
+**Monitor view (`/portal/checkin`):**
+- Lives in the portal with standard sidebar nav
+- Same role access as kiosk
+- Left: live attendee list, polls every 5s, newest first, count badge, yellow highlight for new entries
+- Right: Session controls (Open/Close, shows PIN to admin), manual check-in search panel
+- "Launch Kiosk Mode ↗" button opens `/checkin` in a new tab
 
 #### Session model
 
-An admin opens a **check-in session** before the meeting starts:
-- Sets the meeting date (defaults to today)
-- Sets a 4-digit PIN (displayed to kiosk operator)
-- Session stays open until manually closed or 5 hours after open time
-
-The kiosk page checks for an active session. If no session is open, shows a "Check-in is not open yet" holding screen. If session is open, shows the check-in UI — no login required, just the PIN gate (entered once when setting up the iPad).
-
-#### Check-in flow (kiosk)
-
-```
-[Type your name]
-     ↓ fuzzy match
-[John Smith — Attorney]  ← tap to select
-[Sarah Johnson — Realtor]
-     ↓
-"Welcome, John Smith! ✓"  ← 3 seconds
-     ↓
-[reset to blank input]
-```
+Admin opens a session from the monitor before the meeting (meeting date + optional notes). Session stays open until manually closed. Kiosk shows holding screen if no active session.
 
 #### Data model
 
@@ -1554,57 +1528,42 @@ The kiosk page checks for an active session. If no session is open, shows a "Che
 CREATE TABLE checkin_sessions (
   id VARCHAR(128) PRIMARY KEY,
   meeting_date DATE NOT NULL,
-  pin VARCHAR(8) NOT NULL,               -- 4-digit PIN for kiosk access
-  opened_by VARCHAR(128) REFERENCES users(id),
+  pin VARCHAR(8) NOT NULL,
+  opened_by VARCHAR(128) REFERENCES users(id),  -- nullable (FK-safe)
   opened_at TIMESTAMP DEFAULT NOW(),
   closed_at TIMESTAMP,
   is_active BOOLEAN DEFAULT TRUE,
-  notes TEXT DEFAULT '',                 -- e.g., "Regular Wednesday lunch"
-  UNIQUE(meeting_date)                   -- one session per meeting date
+  notes VARCHAR(512) DEFAULT ''
 );
 ```
 
-Check-ins are recorded to the existing `attendance` table:
-- `type = 'regular'`
-- `date = session.meeting_date`
-- `recorded_by = null` (self-service) or `admin_user_id` (monitor entry)
-- Duplicate check: if a member already has attendance for this date, check-in silently succeeds (idempotent)
+Check-ins write to the existing `attendance` table (`type = 'regular'`). Idempotent — duplicate check-ins succeed silently.
 
-#### Scope of work
+#### Files (as built)
 
-- `app/(kiosk)/layout.tsx` — minimal layout, no header/nav, full-height, kiosk CSS (prevent scroll, large touch targets)
-- `app/(kiosk)/checkin/page.tsx` — client component kiosk UI
-- `app/(kiosk)/checkin/monitor/page.tsx` — Clerk-protected monitor UI with real-time list
-- `app/api/checkin/session/route.ts` — GET active session (kiosk polls this), POST open session
-- `app/api/checkin/session/[id]/route.ts` — PATCH (close session), GET with attendee list
-- `app/api/checkin/route.ts` — POST check-in (validates PIN + session, writes attendance)
-- `app/api/checkin/stream/route.ts` — SSE endpoint streaming new check-in events to monitor
-- `lib/queries/checkin.ts` — session + attendance queries
-- Admin sidebar: add "Live Check-In" quick link under Attendance
-
-#### Design
-
-- **Kiosk page:** White/clean. Giant name input centered. Rotary logo top. Large, rounded member cards for matches. Green success animation. Designed for fingers, not mouse.
-- **Monitor page:** Dark sidebar with attendee list scrolling in. Right panel is a standard admin-style form. Real-time counter prominent at top.
-
-#### Access / Security
-
-- Kiosk page: protected only by session PIN (4 digits, set per session). No Clerk session needed. The PIN is stored server-side in `checkin_sessions` — the client sends it with each check-in request.
-- Monitor page: full Clerk auth, `club_admin`+
-- Session API (open/close): `club_admin`+
-- Check-in API: validates PIN only (no auth header required), rate-limited to prevent abuse
+- `src/app/(kiosk)/layout.tsx` — minimal full-screen layout (no header/nav)
+- `src/app/(kiosk)/checkin/page.tsx` — kiosk UI, Clerk-auth, no PIN
+- `src/app/portal/checkin/page.tsx` — monitor UI in portal layout
+- `src/app/api/checkin/route.ts` — GET member search, POST check-in (Clerk-auth)
+- `src/app/api/checkin/session/route.ts` — GET active session (public), POST open session (admin)
+- `src/app/api/checkin/session/[id]/route.ts` — GET with attendees + PIN, PATCH close
+- `src/app/api/checkin/attendees/route.ts` — monitor polling endpoint (Clerk-auth)
+- `src/lib/queries/checkin.ts` — session + attendance queries
+- `src/lib/auth.ts` — added `checkin_operator` role + `canAccessCheckin()` helper
+- Portal sidebar: "Check-In" link (role-gated, `checkin_operator`+)
 
 ---
 
 ### Priority / Sequencing
 
-| Feature | Build Priority | Dependency | Estimated Complexity |
-|---------|:-:|---------|:-:|
-| **iPad Kiosk Check-In** | **Immediate** | None | Low-Medium |
-| SMS Broadcast | High — high member value | None | Medium |
-| Membership Pipeline | High — core club ops | None | Medium |
-| Community CRM | Medium | None | Medium |
-| Board Management Portal | Medium — board-facing | None | High |
+| Feature | Status | Build Priority | Dependency | Estimated Complexity |
+|---------|:------:|:-:|---------|:-:|
+| iPad Kiosk Check-In | ✅ Done | — | — | — |
+| SMS Broadcast | Planned | High | None | Medium |
+| Membership Pipeline | Planned | High | None | Medium |
+| Community CRM | Planned | Medium | None | Medium |
+| Constant Contact | Planned | Medium | Community CRM + Pipeline | Medium |
+| Board Management Portal | Planned | Medium | None | High |
 
 ---
 

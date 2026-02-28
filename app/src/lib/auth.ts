@@ -10,6 +10,7 @@ export type Role =
   | "website_admin"
   | "uncorked_committee"
   | "committee_chair"
+  | "checkin_operator"
   | "member"
   | "guest";
 
@@ -101,6 +102,7 @@ const ROLE_HIERARCHY: Role[] = [
   "website_admin",
   "uncorked_committee",
   "committee_chair",
+  "checkin_operator",
   "member",
   "guest",
 ];
@@ -122,5 +124,12 @@ export function isAdmin(roles: Role[]): boolean {
 export function canAccessUncorkedHub(roles: Role[]): boolean {
   return roles.some((r) =>
     ["super_admin", "club_admin", "uncorked_committee"].includes(r)
+  );
+}
+
+// Check if roles array includes check-in access
+export function canAccessCheckin(roles: Role[]): boolean {
+  return roles.some((r) =>
+    ["super_admin", "club_admin", "board_member", "checkin_operator"].includes(r)
   );
 }

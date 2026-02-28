@@ -333,3 +333,17 @@ export const membershipInquiries = pgTable("membership_inquiries", {
   processedBy: varchar("processed_by", { length: 128 }).references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+// ============================================
+// checkin_sessions — iPad kiosk attendance sessions
+// ============================================
+export const checkinSessions = pgTable("checkin_sessions", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  meetingDate: date("meeting_date").notNull(),
+  pin: varchar("pin", { length: 8 }).notNull(),
+  openedBy: varchar("opened_by", { length: 128 }).references(() => users.id),
+  openedAt: timestamp("opened_at").notNull().defaultNow(),
+  closedAt: timestamp("closed_at"),
+  isActive: boolean("is_active").notNull().default(true),
+  notes: varchar("notes", { length: 512 }).notNull().default(""),
+});

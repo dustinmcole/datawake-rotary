@@ -225,6 +225,36 @@
 
 ---
 
+### iPad Kiosk Check-In — DONE
+
+**New table:** `checkin_sessions` (id, meetingDate, pin, openedBy, openedAt, closedAt, isActive, notes) — schema pushed to Neon.
+
+**New files:**
+- `src/lib/queries/checkin.ts` — session + attendee queries
+- `src/app/api/checkin/route.ts` — GET member search (PIN-validated, public), POST check-in (PIN or Clerk admin)
+- `src/app/api/checkin/session/route.ts` — GET active session (public, no PIN), POST open session (admin)
+- `src/app/api/checkin/session/[id]/route.ts` — GET with attendees + PIN (admin), PATCH close (admin)
+- `src/app/api/checkin/attendees/route.ts` — monitor polling endpoint (Clerk-protected admin)
+- `src/app/(kiosk)/layout.tsx` — minimal layout, no nav/header
+- `src/app/(kiosk)/checkin/page.tsx` — iPad kiosk: PIN entry modal, member fuzzy search, tap to check in, success overlays
+- `src/app/(kiosk)/checkin/monitor/page.tsx` — admin monitor: live attendee list (5s poll), session controls, manual check-in panel
+
+**Modified:**
+- `src/lib/db/schema.ts` — added checkinSessions table
+- `src/proxy.ts` — added /checkin, /api/checkin, /api/checkin/session as public routes
+- `src/components/layout/admin-sidebar.tsx` — added "Live Check-In" link (ClipboardCheck icon)
+
+**Auth model (refactored — PIN removed):**
+- `/checkin` — Clerk-protected, `checkin_operator` / `board_member` / `club_admin` / `super_admin`
+- `/portal/checkin` — Clerk-protected, same roles, lives in portal layout
+- All `/api/checkin/*` — Clerk-protected (except GET `/api/checkin/session` which is public/safe — returns no PIN)
+- New role `checkin_operator` added to `src/lib/auth.ts`
+- `openedBy` FK is nullable + uses `getUserByClerkId` lookup (fixes 500 when user not yet seeded in DB)
+
+**Build:** clean, 72 routes, 0 TS errors.
+
+---
+
 ## In Progress
 
 _(none currently)_

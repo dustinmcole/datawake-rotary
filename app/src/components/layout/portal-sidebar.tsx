@@ -14,6 +14,7 @@ import {
   MessageCircle,
   ShieldCheck,
   Wine,
+  ClipboardCheck,
   Menu,
   X,
 } from "lucide-react";
@@ -39,6 +40,7 @@ export function PortalSidebar() {
   const roles = (user?.publicMetadata?.roles as string[]) ?? [];
   const showAdmin = roles.some((r) => ["super_admin", "club_admin", "board_member", "website_admin"].includes(r));
   const showUncorked = roles.some((r) => ["super_admin", "club_admin", "uncorked_committee"].includes(r));
+  const showCheckin = roles.some((r) => ["super_admin", "club_admin", "board_member", "checkin_operator"].includes(r));
 
   useEffect(() => {
     setOpen(false);
@@ -119,9 +121,18 @@ export function PortalSidebar() {
             );
           })}
 
-          {/* Divider + Admin/Uncorked links (role-gated) */}
-          {(showAdmin || showUncorked) && (
+          {/* Divider + role-gated links */}
+          {(showAdmin || showUncorked || showCheckin) && (
             <div className="pt-4 mt-4 border-t border-slate-800">
+              {showCheckin && (
+                <Link
+                  href="/portal/checkin"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-white transition-all"
+                >
+                  <ClipboardCheck className="w-[18px] h-[18px] text-slate-600" />
+                  Check-In
+                </Link>
+              )}
               {showAdmin && (
                 <Link
                   href="/admin"

@@ -17,6 +17,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/vendor-interest",
   "/api/pages(.*)",
   "/api/membership-inquiries",
+  // Keep this one public — kiosk polls it to show "session active" without auth
+  "/api/checkin/session",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

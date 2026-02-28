@@ -1,0 +1,19 @@
+[Unit]
+Description=Anthropic Langfuse Proxy for Bryn
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+WorkingDirectory=/opt/bryn/rotary/scripts
+EnvironmentFile=/opt/bryn/rotary/.env.proxy
+ExecStart=/usr/bin/node /opt/bryn/rotary/scripts/anthropic-langfuse-proxy.mjs
+Restart=always
+RestartSec=5
+StandardOutput=append:/opt/bryn/rotary/logs/anthropic-proxy.log
+StandardError=append:/opt/bryn/rotary/logs/anthropic-proxy.log
+
+[Install]
+WantedBy=multi-user.target

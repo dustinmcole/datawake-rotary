@@ -14,3 +14,4 @@ node_modules/
 # OpenClaw runtime state
 .openclaw/
 *.lock
+.vercel
