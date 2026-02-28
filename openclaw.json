@@ -1,7 +1,7 @@
 {
   "name": "bryn-fullerton-rotary",
   "display_name": "Bryn — Fullerton Rotary Club",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "runtime": "openclaw",
   "timezone": "America/Los_Angeles",
 
@@ -13,6 +13,19 @@
     "agents": "AGENTS.md",
     "memory": "MEMORY.md",
     "skills_dir": "skills"
+  },
+
+  "deployment": {
+    "type": "dedicated",
+    "provider": "digitalocean",
+    "droplet_size": "s-1vcpu-2gb",
+    "region": "sfo3",
+    "hostname": "bryn-rotary",
+    "monthly_cost": 12,
+    "fleet_management": "komodo",
+    "networking": "tailscale",
+    "provisioning": "ansible",
+    "monitor_vps": "bryn-monitor"
   },
 
   "channels": {
@@ -63,6 +76,37 @@
     }
   },
 
+  "secrets": {
+    "provider": "op",
+    "vault": "Clients",
+    "item": "FullertonRotary",
+    "refs": {
+      "ANTHROPIC_API_KEY": { "source": "exec", "provider": "op", "id": "op://Clients/FullertonRotary/ANTHROPIC_API_KEY" },
+      "SLACK_BOT_TOKEN": { "source": "exec", "provider": "op", "id": "op://Clients/FullertonRotary/SLACK_BOT_TOKEN" },
+      "DATABASE_URL": { "source": "exec", "provider": "op", "id": "op://Clients/FullertonRotary/DATABASE_URL" }
+    },
+    "note": "All credentials resolved via 1Password CLI at startup. Run: openclaw secrets audit --check"
+  },
+
+  "observability": {
+    "langfuse": {
+      "enabled": true,
+      "host": "bryn-monitor",
+      "project": "bryn-fullerton-rotary",
+      "note": "Traces routed through LLM proxy on bryn-monitor (137.184.4.57)"
+    },
+    "llm_proxy": {
+      "enabled": true,
+      "port": 4010,
+      "note": "Set ANTHROPIC_BASE_URL to proxy endpoint for trace capture"
+    },
+    "workspace_git": {
+      "enabled": true,
+      "auto_commit_interval": "*/15 * * * *",
+      "note": "Auto-commit workspace changes every 15 min for version control"
+    }
+  },
+
   "models": {
     "default": "claude-sonnet-4-6",
     "reasoning": "claude-opus-4-6",
@@ -83,6 +127,16 @@
     "human_in_the_loop": true,
     "draft_before_send": true,
     "read_only_default": true,
-    "env_file": ".env"
+    "env_file": ".env",
+    "secrets_audit": true,
+    "user_allowlist": true,
+    "channel_allowlist": true
+  },
+
+  "health_check": {
+    "interval": "*/30 * * * *",
+    "checks": ["gateway", "slack", "clickup"],
+    "alert_channel": "slack:#internal-rotary",
+    "note": "Posts status to central monitoring webhook on bryn-monitor"
   }
 }

@@ -16,27 +16,34 @@ const NAV_LINKS = [
 ];
 
 function RotaryWheel({ className }: { className?: string }) {
+  // Pre-computed to avoid server/client floating-point hydration mismatch
+  const spokes = [
+    { x1: "24", y1: "20", x2: "38", y2: "20" },
+    { x1: "22", y1: "23.464", x2: "29", y2: "32.124" },
+    { x1: "18", y1: "23.464", x2: "11", y2: "32.124" },
+    { x1: "16", y1: "20", x2: "2", y2: "20" },
+    { x1: "18", y1: "16.536", x2: "11", y2: "7.876" },
+    { x1: "22", y1: "16.536", x2: "29", y2: "7.876" },
+  ];
+  const dots = [
+    { cx: "33.99", cy: "27.5" },
+    { cx: "20", cy: "35" },
+    { cx: "6.01", cy: "27.5" },
+    { cx: "6.01", cy: "12.5" },
+    { cx: "20", cy: "5" },
+    { cx: "33.99", cy: "12.5" },
+  ];
   return (
     <svg viewBox="0 0 40 40" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="20" cy="20" r="18" stroke="currentColor" strokeWidth="2.5" />
       <circle cx="20" cy="20" r="12" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="20" cy="20" r="4" fill="currentColor" />
-      {[0, 60, 120, 180, 240, 300].map((angle) => {
-        const rad = (angle * Math.PI) / 180;
-        const x1 = 20 + 4 * Math.cos(rad);
-        const y1 = 20 + 4 * Math.sin(rad);
-        const x2 = 20 + 18 * Math.cos(rad);
-        const y2 = 20 + 18 * Math.sin(rad);
-        return (
-          <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="1.5" />
-        );
-      })}
-      {[30, 90, 150, 210, 270, 330].map((angle) => {
-        const rad = (angle * Math.PI) / 180;
-        const cx = 20 + 15 * Math.cos(rad);
-        const cy = 20 + 15 * Math.sin(rad);
-        return <circle key={angle} cx={cx} cy={cy} r="2" fill="currentColor" />;
-      })}
+      {spokes.map((s, i) => (
+        <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke="currentColor" strokeWidth="1.5" />
+      ))}
+      {dots.map((d, i) => (
+        <circle key={i} cx={d.cx} cy={d.cy} r="2" fill="currentColor" />
+      ))}
     </svg>
   );
 }

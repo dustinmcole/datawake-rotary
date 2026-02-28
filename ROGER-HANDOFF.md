@@ -1,9 +1,9 @@
-# Jacob Build Handoff — Fullerton Rotary Platform
+# Roger Build Handoff — Fullerton Rotary Platform
 
-**Agent:** Jacob (OpenClaw, Gemini)
+**Agent:** Roger (OpenClaw, Gemini)
 **Task:** Build the Bryn AI assistant backend + chat UI (Terminals 4A & 4B)
 **Repo:** github.com/dustinmcole/datawake-rotary (private)
-**Branch:** `jacob/bryn-build` (branch off `main`)
+**Branch:** `roger/bryn-build` (branch off `main`)
 **Slack:** #internal-rotary (C0AGHLNCL6S) — post progress, ask questions
 **Managed by:** Dustin Cole (dustin@datawake.io)
 
@@ -283,7 +283,7 @@ Bryn's configuration is managed EXCLUSIVELY by Dustin Cole through Datawake Slac
 
 ## Branch Strategy
 
-1. Branch off `main` → `jacob/bryn-build`
+1. Branch off `main` → `roger/bryn-build`
 2. Commit frequently with clear messages
 3. Push after each meaningful chunk of work
 4. When T4A is complete, post to #internal-rotary for review
@@ -297,7 +297,7 @@ Bryn's configuration is managed EXCLUSIVELY by Dustin Cole through Datawake Slac
 Every 20 minutes:
 1. `git pull origin main` (get any changes Dustin made)
 2. Read `BUILD-COORD.md` for current status
-3. Read this file (`JACOB-HANDOFF.md`) for task details
+3. Read this file (`ROGER-HANDOFF.md`) for task details
 4. Continue where you left off
 5. Commit + push progress
 6. If stuck or need a decision, post to #internal-rotary and stop
@@ -307,7 +307,7 @@ Every 20 minutes:
 
 Update BUILD-COORD.md "In Progress" section with:
 ```
-### Terminal 4A: Bryn Agent Backend — IN PROGRESS (Jacob)
+### Terminal 4A: Bryn Agent Backend — IN PROGRESS (Roger)
 - [x] System prompt builder
 - [x] Tool definitions
 - [ ] Tool executors
@@ -327,7 +327,7 @@ Post to #internal-rotary (C0AGHLNCL6S) at these milestones:
 
 Format:
 ```
-[Jacob/Rotary] {status emoji} {brief update}
+[Roger/Rotary] {status emoji} {brief update}
 Files: {list of files created/modified}
 Next: {what you'll work on next}
 ```
@@ -397,7 +397,7 @@ Also read all other query files in src/lib/queries/ to understand what data acce
 
 ## Environment Variables Needed
 
-Jacob needs these in the environment (or .env.local):
+Roger needs these in the environment (or .env.local):
 ```
 DATABASE_URL=...          # Already configured
 ANTHROPIC_API_KEY=...     # For Bryn's AI responses
