@@ -126,6 +126,10 @@ fullertonrotaryclub.com
 │   ├── /uncorked-hub/committee .. Committee directory
 │   └── /uncorked-hub/vendor-interest . Public submission review
 │
+├── /checkin ..................... 🔒 iPad Kiosk (Clerk-auth, checkin_operator+, full-screen)
+│
+├── /portal/checkin .............. 🔒 Check-In Monitor (portal, checkin_operator+)
+│
 ├── /board ....................... 🔒 Board Management Portal (board members + officers)
 │   ├── /board ................... Board dashboard (upcoming meetings, open action items)
 │   ├── /board/meetings .......... Meeting agendas, minutes, attendance
@@ -153,6 +157,7 @@ fullertonrotaryclub.com
 ```
 
 **New route groups planned:**
+- `(kiosk)/` — iPad kiosk check-in, full-screen no-chrome layout, PIN-gated
 - `(board)/` — Board Management Portal, `board_member`+ access, blue/silver palette
 - Admin subpages for SMS, Community CRM, and Membership Pipeline under `/admin/*`
 
@@ -180,35 +185,37 @@ fullertonrotaryclub.com
 | `website_admin` | 3 | Designated tech person(s) | Edit public website pages via CMS/Bryn |
 | `uncorked_committee` | 4 | Uncorked planning team (~20 people) | Full access to Uncorked Hub |
 | `committee_chair` | 5 | Committee chairs | Manage their committee, submit events |
-| `member` | 6 | All active Rotary members | Portal: directory, profile, attendance, events, Bryn (basic) |
-| `guest` | 7 | Prospective members | Limited portal view (public + some events) |
+| `checkin_operator` | 6 | Volunteers, secretary, designated staff | Run the iPad kiosk and monitor at weekly lunches |
+| `member` | 7 | All active Rotary members | Portal: directory, profile, attendance, events, Bryn (basic) |
+| `guest` | 8 | Prospective members | Limited portal view (public + some events) |
 
 ### Permission Matrix
 
-| Feature | Super Admin | Club Admin | Board | Website Admin | Uncorked | Chair | Member | Guest |
-|---------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| Public website | Edit | View | View | Edit | View | View | View | View |
-| Member directory | Full | Full | View | View | View | View | View | — |
-| Own profile | Full | Full | Full | Full | Full | Full | Full | — |
-| Attendance (own) | Full | Full | Full | Full | Full | Full | Full | — |
-| Attendance (all) | Full | Full | View | — | — | — | — | — |
-| Committees | Full | Full | Manage own | — | — | Manage own | View | — |
-| Events (submit) | Full | Full | Full | Full | Full | Full | Full | — |
-| Events (approve) | Full | Full | — | — | — | — | — | — |
-| Announcements | Full | Full | — | — | — | — | — | — |
-| Reports | Full | Full | View | — | — | — | — | — |
-| Manage members | Full | Full | — | — | — | — | — | — |
-| Manage roles | Full | — | — | — | — | — | — | — |
-| Uncorked Hub | Full | Full | — | — | Full | — | — | — |
-| Bryn (website edit) | Full | — | — | Full | — | — | — | — |
-| Bryn (reports) | Full | Full | View | — | — | — | — | — |
-| Bryn (basic Q&A) | Full | Full | Full | Full | Full | Full | Full | — |
-| Admin panel | Full | Full | Partial | Partial | — | — | — | — |
-| Settings | Full | — | — | — | — | — | — | — |
-| **SMS Broadcast** | **Full** | **Full** | **—** | **—** | **—** | **—** | **—** | **—** |
-| **Community CRM** | **Full** | **Full** | **View** | **—** | **—** | **—** | **—** | **—** |
-| **Membership Pipeline** | **Full** | **Full** | **View** | **—** | **—** | **—** | **—** | **—** |
-| **Board Portal** | **Full** | **Full** | **Full** | **—** | **—** | **—** | **—** | **—** |
+| Feature | Super Admin | Club Admin | Board | Website Admin | Uncorked | Chair | Check-In Op | Member | Guest |
+|---------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| Public website | Edit | View | View | Edit | View | View | View | View | View |
+| Member directory | Full | Full | View | View | View | View | — | View | — |
+| Own profile | Full | Full | Full | Full | Full | Full | Full | Full | — |
+| Attendance (own) | Full | Full | Full | Full | Full | Full | Full | Full | — |
+| Attendance (all) | Full | Full | View | — | — | — | — | — | — |
+| Committees | Full | Full | Manage own | — | — | Manage own | — | View | — |
+| Events (submit) | Full | Full | Full | Full | Full | Full | — | Full | — |
+| Events (approve) | Full | Full | — | — | — | — | — | — | — |
+| Announcements | Full | Full | — | — | — | — | — | — | — |
+| Reports | Full | Full | View | — | — | — | — | — | — |
+| Manage members | Full | Full | — | — | — | — | — | — | — |
+| Manage roles | Full | — | — | — | — | — | — | — | — |
+| Uncorked Hub | Full | Full | — | — | Full | — | — | — | — |
+| Bryn (website edit) | Full | — | — | Full | — | — | — | — | — |
+| Bryn (reports) | Full | Full | View | — | — | — | — | — | — |
+| Bryn (basic Q&A) | Full | Full | Full | Full | Full | Full | — | Full | — |
+| Admin panel | Full | Full | Partial | Partial | — | — | — | — | — |
+| Settings | Full | — | — | — | — | — | — | — | — |
+| **Check-In (kiosk/monitor)** | **Full** | **Full** | **Full** | **—** | **—** | **—** | **Full** | **—** | **—** |
+| **SMS Broadcast** | **Full** | **Full** | **—** | **—** | **—** | **—** | **—** | **—** | **—** |
+| **Community CRM** | **Full** | **Full** | **View** | **—** | **—** | **—** | **—** | **—** | **—** |
+| **Membership Pipeline** | **Full** | **Full** | **View** | **—** | **—** | **—** | **—** | **—** | **—** |
+| **Board Portal** | **Full** | **Full** | **Full** | **—** | **—** | **—** | **—** | **—** | **—** |
 
 ### Implementation
 
@@ -1164,38 +1171,43 @@ Fullerton Rotary Club
 ## 11. Domain & Deployment
 
 ### Domain Plan
-| Domain | Points to | Purpose |
-|--------|-----------|---------|
-| fullertonrotaryclub.com | Vercel (unified app) | Main platform |
-| fullertonuncorked.org | Separate deployment | Public Uncorked site (managed by other agent) |
-| app-sigma-seven-46.vercel.app | Redirect to fullertonrotaryclub.com/uncorked-hub | Legacy Uncorked planning URL |
+| Domain | Points to | Purpose | Status |
+|--------|-----------|---------|--------|
+| rotary.datawake.io | Vercel (A → 76.76.21.21) | Live platform | **LIVE** |
+| fullertonrotaryclub.com | Wix (for now) | Club's existing public site | Future cutover |
+| fullertonuncorked.org | Separate deployment | Public Uncorked site | Separate |
+| app-sigma-seven-46.vercel.app | Vercel alias | Legacy URL (still works) | Active |
 
-### DNS Migration
-1. Current: fullertonrotaryclub.com → Wix
-2. Target: fullertonrotaryclub.com → Vercel
-3. Need: Access to domain registrar (who controls DNS? Wix? GoDaddy? Confirm with Leslie/Dan)
+### DNS (Cloudflare — datawake.io zone)
+- `A rotary 76.76.21.21` — added 2026-02-28, DNS-only
+- Clerk secondary instance DNS records: TBD — Clerk dashboard will provide these for clerk.rotary.datawake.io
 
-### Environment Variables (add to existing .env)
+### Clerk Configuration — Production Instance
+- Created: 2026-02-28 — Secondary application on datawake.io
+- Clerk API: `clerk.rotary.datawake.io`
+- Verification emails from: `@rotary.datawake.io`
+- Keys: `pk_live_` / `sk_live_` deployed to Vercel production
+- **Remaining:**
+  - Add Clerk-provided DNS records to Cloudflare
+  - Create Dustin's account at rotary.datawake.io/register
+  - Set `publicMetadata: { "roles": ["super_admin"] }` in Clerk dashboard
+
+### Environment Variables — Vercel Production
 ```
-# Existing
-DATABASE_URL=...
-ANTHROPIC_API_KEY=...
-
-# New — Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-CLERK_SECRET_KEY=sk_...
+DATABASE_URL              ✅ set
+ANTHROPIC_API_KEY         ✅ set
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY  ✅ pk_live_ (rotary.datawake.io)
+CLERK_SECRET_KEY          ✅ sk_live_ (rotary.datawake.io)
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/register
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/portal
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/portal
 
-# New — Email (optional)
-RESEND_API_KEY=re_...
-
-# Planned — SMS Broadcast (Section 16A)
-TWILIO_ACCOUNT_SID=AC...
-TWILIO_AUTH_TOKEN=...
-TWILIO_PHONE_NUMBER=+1...
+# Planned
+RESEND_API_KEY            (email sending)
+TWILIO_ACCOUNT_SID        (SMS Broadcast — Section 16A)
+TWILIO_AUTH_TOKEN
+TWILIO_PHONE_NUMBER
 ```
 
 ---
@@ -1381,6 +1393,13 @@ The Planning Hub (`/admin/planning`) is a super_admin-only command center with 6
 | 2026-02-28 | Terminal 4A+4B: Bryn AI Assistant (backend + chat UI) | Done |
 | 2026-02-28 | Roger developer agent + Planning Hub — 6-tab admin command center, 5 Roger tools, streaming chat | Done |
 | 2026-02-28 | Planned feature sets added: SMS Broadcast, Community CRM, Membership Pipeline, Board Portal | Planned |
+| 2026-02-28 | iPad Kiosk Check-In — built and deployed (Section 16E) | Done |
+| 2026-02-28 | Constant Contact integration logged — Section 16F | Planned |
+| 2026-02-28 | Public website redesign — new hero, gear logo, nonprofit spotlight, events grid | Done |
+| 2026-02-28 | Custom domain rotary.datawake.io — Vercel + Cloudflare A record | Done |
+| 2026-02-28 | Clerk production instance — pk_live_ keys deployed to Vercel | Done |
+| | Clerk DNS records added + Dustin user account created | Pending |
+| | fullertonrotaryclub.com DNS cutover from Wix | Future |
 | | Integration testing + polish | Final |
 
 ---
@@ -1473,15 +1492,232 @@ These feature sets are planned but not yet built. Each will become one or more f
 
 ---
 
+---
+
+### 16E. iPad Kiosk Attendance Check-In
+
+**Status:** Built — complete
+**Primary routes:** `/checkin` (kiosk) + `/checkin/monitor` (live view)
+**New tables:** `checkin_sessions`
+**Reuses:** existing `attendance` table
+
+#### Overview
+
+A kiosk-mode check-in experience designed to run on an iPad at the weekly lunch. Members walk up, type their name, and confirm. A separate monitor view (on a laptop or second screen) shows attendees appearing in real-time as people check in.
+
+#### Two views
+
+**Kiosk view (`/checkin`):**
+- No standard site chrome — full screen, clean, tablet-optimized
+- Large text input: "Type your name to check in"
+- Fuzzy search against member list as you type — shows matching members below input
+- Tap a match to confirm: shows their name + photo + "Welcome, John!" success screen for 3 seconds, then resets
+- If no match: "Not found — see the host" message (doesn't block, prevents ghost entries)
+- Guest/visitor mode: if name not in system, can check in as "guest" (recorded separately)
+- Protected by a **session PIN** set when the admin opens the check-in session — not full Clerk auth, so the iPad can stay locked on this page all lunch
+
+**Monitor view (`/checkin/monitor`):**
+- Requires Clerk auth (`club_admin` or `super_admin`)
+- Split layout:
+  - Left: large running list of who has checked in today (photo + name + time), newest at top
+  - Right: manual entry panel — admin can search and check in a member manually (same fuzzy search)
+- Real-time updates: new check-ins appear automatically (SSE stream or polling every 5s)
+- Session controls: "Open Session" (sets meeting date + PIN), "Close Session"
+- Total count badge (e.g., "47 checked in")
+- Export current list to CSV
+
+#### Session model
+
+An admin opens a **check-in session** before the meeting starts:
+- Sets the meeting date (defaults to today)
+- Sets a 4-digit PIN (displayed to kiosk operator)
+- Session stays open until manually closed or 5 hours after open time
+
+The kiosk page checks for an active session. If no session is open, shows a "Check-in is not open yet" holding screen. If session is open, shows the check-in UI — no login required, just the PIN gate (entered once when setting up the iPad).
+
+#### Check-in flow (kiosk)
+
+```
+[Type your name]
+     ↓ fuzzy match
+[John Smith — Attorney]  ← tap to select
+[Sarah Johnson — Realtor]
+     ↓
+"Welcome, John Smith! ✓"  ← 3 seconds
+     ↓
+[reset to blank input]
+```
+
+#### Data model
+
+```sql
+CREATE TABLE checkin_sessions (
+  id VARCHAR(128) PRIMARY KEY,
+  meeting_date DATE NOT NULL,
+  pin VARCHAR(8) NOT NULL,               -- 4-digit PIN for kiosk access
+  opened_by VARCHAR(128) REFERENCES users(id),
+  opened_at TIMESTAMP DEFAULT NOW(),
+  closed_at TIMESTAMP,
+  is_active BOOLEAN DEFAULT TRUE,
+  notes TEXT DEFAULT '',                 -- e.g., "Regular Wednesday lunch"
+  UNIQUE(meeting_date)                   -- one session per meeting date
+);
+```
+
+Check-ins are recorded to the existing `attendance` table:
+- `type = 'regular'`
+- `date = session.meeting_date`
+- `recorded_by = null` (self-service) or `admin_user_id` (monitor entry)
+- Duplicate check: if a member already has attendance for this date, check-in silently succeeds (idempotent)
+
+#### Scope of work
+
+- `app/(kiosk)/layout.tsx` — minimal layout, no header/nav, full-height, kiosk CSS (prevent scroll, large touch targets)
+- `app/(kiosk)/checkin/page.tsx` — client component kiosk UI
+- `app/(kiosk)/checkin/monitor/page.tsx` — Clerk-protected monitor UI with real-time list
+- `app/api/checkin/session/route.ts` — GET active session (kiosk polls this), POST open session
+- `app/api/checkin/session/[id]/route.ts` — PATCH (close session), GET with attendee list
+- `app/api/checkin/route.ts` — POST check-in (validates PIN + session, writes attendance)
+- `app/api/checkin/stream/route.ts` — SSE endpoint streaming new check-in events to monitor
+- `lib/queries/checkin.ts` — session + attendance queries
+- Admin sidebar: add "Live Check-In" quick link under Attendance
+
+#### Design
+
+- **Kiosk page:** White/clean. Giant name input centered. Rotary logo top. Large, rounded member cards for matches. Green success animation. Designed for fingers, not mouse.
+- **Monitor page:** Dark sidebar with attendee list scrolling in. Right panel is a standard admin-style form. Real-time counter prominent at top.
+
+#### Access / Security
+
+- Kiosk page: protected only by session PIN (4 digits, set per session). No Clerk session needed. The PIN is stored server-side in `checkin_sessions` — the client sends it with each check-in request.
+- Monitor page: full Clerk auth, `club_admin`+
+- Session API (open/close): `club_admin`+
+- Check-in API: validates PIN only (no auth header required), rate-limited to prevent abuse
+
+---
+
 ### Priority / Sequencing
 
 | Feature | Build Priority | Dependency | Estimated Complexity |
 |---------|:-:|---------|:-:|
-| SMS Broadcast | High — high member value, admin-only | None | Medium |
+| **iPad Kiosk Check-In** | **Immediate** | None | Low-Medium |
+| SMS Broadcast | High — high member value | None | Medium |
 | Membership Pipeline | High — core club ops | None | Medium |
-| Community CRM | Medium | None (can link to pipeline later) | Medium |
-| Board Management Portal | Medium — board-facing | None | High (many modules) |
+| Community CRM | Medium | None | Medium |
+| Board Management Portal | Medium — board-facing | None | High |
 
-**Recommended build order:** SMS → Membership Pipeline → Community CRM → Board Portal
+---
 
-Each feature set is self-contained and can be built in a single terminal session. No cross-dependencies between the four new feature sets.
+### 16F. Constant Contact Integration
+
+**Status:** Planned / Logged for future development
+**Primary route:** `/admin/settings/integrations` (sub-section) or `/admin/integrations`
+**New tables:** `cc_sync_logs`, `cc_list_mappings`
+**New env vars:** `CONSTANT_CONTACT_API_KEY`, `CONSTANT_CONTACT_CLIENT_ID`, `CONSTANT_CONTACT_CLIENT_SECRET`, `CONSTANT_CONTACT_ACCESS_TOKEN`
+
+#### Overview
+
+Sync defined audience segments from the platform to Constant Contact contact lists. Enables email campaigns to be run from Constant Contact using up-to-date contact data pulled from this platform.
+
+The flow is **one-way push** (platform → Constant Contact). Constant Contact is the sending tool; this platform is the source of truth for contact data.
+
+#### Audience Segments → CC Lists
+
+| Segment Name | Source | Contacts Included |
+|---|---|---|
+| **All Members** | `users` table | All active members (type = 'active') |
+| **Board** | `users` + `officer_terms` | Current board members + officers |
+| **External / Community** | `community_contacts` | All active community contacts (Section 16B) |
+| **Potential Members** | `prospects` | All prospects in pipeline (stages: identified → applied) |
+| **Full List** | All of the above | Deduplicated union of all segments |
+
+Each segment maps to a **Constant Contact List ID** — configured once in the integration settings.
+
+#### Features
+
+- **Manual sync:** "Sync Now" button per segment — pushes current contacts to the mapped CC list
+- **Scheduled sync:** Configurable auto-sync (e.g., nightly at midnight PT) — keeps CC lists current without manual intervention
+- **Sync log:** Timestamped history of every sync — segment name, contacts pushed, contacts added, contacts updated, errors
+- **Field mapping:** Map platform fields to CC contact fields (first name, last name, email, phone, company, custom fields)
+- **Opt-out respect:** Members who have opted out of SMS are flagged; email opt-outs from CC are noted in the sync log but do not block the push (CC manages email opt-outs internally)
+- **List mapping UI:** Admin selects which CC list each segment maps to — dropdown of lists pulled from CC API
+- **OAuth flow:** Constant Contact uses OAuth 2.0 — admin completes one-time auth flow in settings, token stored and auto-refreshed
+
+#### Segment rules
+
+| Segment | Filter |
+|---|---|
+| All Members | `users.status = 'active'` AND `users.member_type IN ('active', 'honorary')` |
+| Board | Users with `board_member` or higher role, OR active `officer_terms` record |
+| External / Community | `community_contacts.status IN ('warm', 'active')` |
+| Potential Members | `prospects.stage NOT IN ('inducted', 'declined')` |
+| Full List | Union of all above, deduplicated by email |
+
+#### Data model
+
+```sql
+CREATE TABLE cc_list_mappings (
+  id VARCHAR(128) PRIMARY KEY,
+  segment_name VARCHAR(64) UNIQUE NOT NULL,  -- all_members, board, external, prospects, full_list
+  cc_list_id VARCHAR(256) NOT NULL,          -- Constant Contact list ID
+  cc_list_name VARCHAR(256) DEFAULT '',      -- human label (cached from CC)
+  auto_sync_enabled BOOLEAN DEFAULT FALSE,
+  auto_sync_schedule VARCHAR(64) DEFAULT 'nightly', -- nightly, weekly, manual
+  last_synced_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE cc_sync_logs (
+  id VARCHAR(128) PRIMARY KEY,
+  segment_name VARCHAR(64) NOT NULL,
+  cc_list_id VARCHAR(256) NOT NULL,
+  triggered_by VARCHAR(128) REFERENCES users(id), -- null = cron
+  status VARCHAR(32) DEFAULT 'success',          -- success, partial, failed
+  contacts_total INTEGER DEFAULT 0,
+  contacts_created INTEGER DEFAULT 0,
+  contacts_updated INTEGER DEFAULT 0,
+  contacts_skipped INTEGER DEFAULT 0,
+  contacts_errored INTEGER DEFAULT 0,
+  error_message TEXT,
+  started_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP
+);
+```
+
+#### Scope of work
+
+- `app/admin/integrations/page.tsx` — Integration settings: CC OAuth connect/disconnect, list mapping config, sync controls
+- `app/api/integrations/constant-contact/auth/route.ts` — OAuth callback handler
+- `app/api/integrations/constant-contact/lists/route.ts` — GET available CC lists (proxy to CC API)
+- `app/api/integrations/constant-contact/sync/route.ts` — POST trigger manual sync for a segment
+- `app/api/integrations/constant-contact/sync/[segment]/route.ts` — GET sync status + log history
+- `app/api/cron/cc-sync/route.ts` — Vercel Cron route for nightly auto-sync
+- `lib/integrations/constant-contact.ts` — CC API client (OAuth token management, contact upsert, list fetch)
+- `lib/queries/integrations.ts` — sync log + list mapping queries
+- Admin sidebar: Integrations link under Settings
+
+#### CC API notes
+
+- Constant Contact V3 API (`https://api.cc.email/v3/`)
+- Contact upsert endpoint: `PUT /contacts` with `email_address` as unique key
+- Bulk import: `POST /activities/contacts` — async bulk upsert (preferred for large lists)
+- Lists: `GET /contact_lists` — returns all CC lists in the account
+- OAuth: Authorization Code flow, token endpoint at `https://authz.constantcontact.com/oauth2/default/v1/token`
+
+---
+
+### Priority / Sequencing
+
+| Feature | Build Priority | Dependency | Estimated Complexity |
+|---------|:-:|---------|:-:|
+| **iPad Kiosk Check-In** | **Immediate** | None | Low-Medium |
+| SMS Broadcast | High | None | Medium |
+| Membership Pipeline | High — core club ops | None | Medium |
+| Community CRM | Medium | None | Medium |
+| Constant Contact Integration | Medium | Community CRM + Membership Pipeline (for full segment coverage) | Medium |
+| Board Management Portal | Medium — board-facing | None | High |
+
+**Recommended build order:** iPad Check-In → SMS → Membership Pipeline → Community CRM → Constant Contact → Board Portal
+
+Each feature set is self-contained and can be built in a single terminal session.
