@@ -261,6 +261,46 @@ _(none currently)_
 
 ---
 
+## Rex Task Queue (Rotary Builder Agent)
+
+**Builder:** Rex (Gemini 3.1 Pro via OpenClaw)
+**Channel:** #internal-rotary-dev
+**Branch pattern:** `rex/{feature-name}`
+
+### Priority 1: SMS Broadcast System
+- **Task:** Build `/admin/messaging` page and API routes
+- **Scope:** Twilio integration, targeted sends by role/committee/status, message templates, delivery tracking
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/app/admin/messaging/page.tsx, src/app/api/admin/messaging/route.ts, src/lib/queries/messaging.ts
+- **Acceptance:** Admin can compose, target, and send SMS. Delivery status visible.
+
+### Priority 2: Membership Pipeline
+- **Task:** Build `/admin/membership-pipeline` Kanban board
+- **Scope:** Prospect tracking (lead → contacted → visited → applied → approved → active), convert to member
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/app/admin/membership-pipeline/page.tsx, src/app/api/admin/prospects/route.ts, src/lib/db/schema.ts (new table: prospects), src/lib/queries/prospects.ts
+- **Acceptance:** Kanban drag-drop, prospect CRUD, convert-to-member action
+
+### Priority 3: Community CRM
+- **Task:** Build `/admin/community-crm` for non-member contacts
+- **Scope:** Track community contacts (donors, partners, speakers, press), tag system, interaction log
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/app/admin/community-crm/page.tsx, src/app/api/admin/contacts/route.ts, src/lib/db/schema.ts (new tables: contacts, contactTags, contactInteractions), src/lib/queries/contacts.ts
+- **Acceptance:** Contact CRUD, tag management, interaction timeline
+
+### Priority 4: Board Management Portal
+- **Task:** Build `/board/*` route group
+- **Scope:** Board meetings, resolutions, documents, officer directory, budget overview
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/app/board/layout.tsx, multiple page.tsx files, src/lib/db/schema.ts (new tables), API routes
+- **Acceptance:** Board members can view meetings, resolutions, documents. Protected by board_member+ role.
+
+---
+
 ## Known Issues
 
 _(Add any issues that affect other terminals here)_
