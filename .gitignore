@@ -1,0 +1,16 @@
+# Secrets
+.env
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+
+# Runtime
+node_modules/
+.DS_Store
+
+# OpenClaw runtime state
+.openclaw/
+*.lock

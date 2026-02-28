@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-wine-50: #fdf2f4;
+  --color-wine-100: #fce7eb;
+  --color-wine-200: #f9d0d9;
+  --color-wine-300: #f4a9ba;
+  --color-wine-400: #ec7896;
+  --color-wine-500: #df4d74;
+  --color-wine-600: #cc2d5a;
+  --color-wine-700: #ab1f48;
+  --color-wine-800: #8f1d3f;
+  --color-wine-900: #722039;
+  --color-wine-950: #4a0d20;
+
+  --color-gold-50: #fffbeb;
+  --color-gold-100: #fef3c7;
+  --color-gold-200: #fde68a;
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+  --color-gold-800: #92400e;
+  --color-gold-900: #78350f;
+  --color-gold-950: #451a03;
+
+  --color-cream-50: #fefdfb;
+  --color-cream-100: #fdf9f0;
+  --color-cream-200: #faf3e0;
+  --color-cream-300: #f5e8c8;
+
+  --color-navy-50: #e8eef4;
+  --color-navy-100: #c5d5e5;
+  --color-navy-200: #9fb8d1;
+  --color-navy-300: #789abc;
+  --color-navy-400: #5a83ad;
+  --color-navy-500: #1a5276;
+  --color-navy-600: #0d4068;
+  --color-navy-700: #003366;
+  --color-navy-800: #002a54;
+  --color-navy-900: #001f3d;
+  --color-navy-950: #001229;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --sidebar-width: 260px;
+}
+
+body {
+  background: var(--color-cream-50);
+  color: #1a1a2e;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-wine-200);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wine-300);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes countPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+.animate-count-pulse {
+  animation: countPulse 2s ease-in-out infinite;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-wine-800), var(--color-wine-600));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Rich card hover */
+.card-hover {
+  transition: all 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(114, 32, 57, 0.15);
+}
+
+/* Kanban column */
+.kanban-column {
+  min-height: 400px;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  background: rgba(74, 13, 32, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+/* Status badge base */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}

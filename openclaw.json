@@ -1,0 +1,88 @@
+{
+  "name": "bryn-fullerton-rotary",
+  "display_name": "Bryn — Fullerton Rotary Club",
+  "version": "1.0.0",
+  "runtime": "openclaw",
+  "timezone": "America/Los_Angeles",
+
+  "workspace": {
+    "path": "./workspace",
+    "soul": "SOUL.md",
+    "identity": "IDENTITY.md",
+    "user": "USER.md",
+    "agents": "AGENTS.md",
+    "memory": "MEMORY.md",
+    "skills_dir": "skills"
+  },
+
+  "channels": {
+    "slack": {
+      "enabled": true,
+      "mode": "socket",
+      "channels": [
+        {
+          "id": "internal-rotary",
+          "name": "#internal-rotary",
+          "type": "internal",
+          "workspace": "datawake"
+        },
+        {
+          "id": "bryn-rotary",
+          "name": "#bryn-rotary",
+          "type": "config",
+          "workspace": "datawake",
+          "note": "Configuration channel — only Dustin can modify Bryn's config through this channel"
+        }
+      ]
+    },
+    "email": {
+      "enabled": false,
+      "provider": "gmail",
+      "note": "Enable after Gmail OAuth setup"
+    },
+    "imessage": {
+      "enabled": false,
+      "note": "Requires Mac mini deployment"
+    }
+  },
+
+  "integrations": {
+    "clickup": {
+      "enabled": true,
+      "workspace_id": "90131943544",
+      "scoped_folders": [],
+      "note": "Add Rotary folder ID after ClickUp setup"
+    },
+    "google_calendar": {
+      "enabled": false,
+      "note": "Enable after Google OAuth setup"
+    },
+    "salesforce": {
+      "enabled": false,
+      "note": "Not needed for Rotary"
+    }
+  },
+
+  "models": {
+    "default": "claude-sonnet-4-6",
+    "reasoning": "claude-opus-4-6",
+    "fast": "claude-haiku-4-5-20251001"
+  },
+
+  "cron": {
+    "config": "./cron/jobs.json"
+  },
+
+  "logging": {
+    "dir": "./logs",
+    "audit": true,
+    "level": "info"
+  },
+
+  "security": {
+    "human_in_the_loop": true,
+    "draft_before_send": true,
+    "read_only_default": true,
+    "env_file": ".env"
+  }
+}
