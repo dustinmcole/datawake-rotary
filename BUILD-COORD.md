@@ -185,26 +185,37 @@
 
 **Design system followed:** Admin pages use gray/blue palette (bg-white cards, border-gray-200, blue-600 CTA buttons, amber-600 for admin highlights). Consistent with shared conventions.
 
+### Terminal 4A: Bryn Agent Backend — DONE
+**Vercel AI SDK v6** (ai@6, @ai-sdk/anthropic@3) with zod/v4 schemas.
+
+- `src/lib/bryn/system-prompt.ts` — Dynamic prompt builder (personality, user context, 4 agent contexts, behavioral rules)
+- `src/lib/bryn/tools.ts` — 17 tools across 4 contexts (member, website, operations, uncorked), role-filtered, execute functions bound per-request
+- `src/lib/bryn/tool-executors.ts` — Server-side executors wrapping existing query functions. Mutation tools (edit_page_content, create_announcement, manage_event) support confirmation flow with `requiresConfirmation` flag
+- `src/lib/bryn/audit.ts` — Tool call audit logging to chatMessages.toolCalls JSON column
+- `src/app/api/bryn/chat/route.ts` — POST streaming chat: Clerk auth → user lookup → role-based tool filtering → `streamText()` with `anthropic('claude-sonnet-4-6')` → `toTextStreamResponse()`
+- `src/app/api/bryn/threads/route.ts` — GET (list user threads) + POST (create thread)
+- `src/app/api/bryn/threads/[id]/route.ts` — GET thread with messages (ownership check)
+- `src/app/api/bryn/threads/[id]/messages/route.ts` — POST message to thread
+
+**AI SDK v6 notes for T4B:**
+- Uses `stopWhen: stepCountIs(5)` not `maxSteps`
+- Tool inputs accessed via `tc.input` not `tc.args`
+- Response is `toTextStreamResponse()` (plain text streaming)
+- Tools have `inputSchema` (zod/v4) not `parameters`
+- Confirmation detection via regex on last user message
+
+### Terminal 4B: Bryn Chat UI — DONE
+- `src/app/portal/bryn/page.tsx` — Full chat page: thread sidebar, message list with streaming, agent context selector (role-gated), suggested questions, auto-scroll, keyboard shortcuts
+- `src/hooks/use-bryn-chat.ts` — Client hook: message state, streaming via fetch ReadableStream, auto-persist to threads, abort support
+- `src/components/bryn/chat-message.tsx` — Message bubbles (user: blue, Bryn: white with sparkle avatar, typing indicator)
+- `src/components/bryn/confirmation-card.tsx` — Amber confirmation card with preview and Confirm/Cancel buttons
+- `src/components/bryn/bryn-widget.tsx` — Floating chat bubble (bottom-right), expands to mini chat window, links to full chat
+
+---
+
 ## In Progress
 
-### Terminal 4A: Bryn Agent Backend — ASSIGNED (Jacob)
-Agent: Jacob (OpenClaw, Gemini)
-Branch: `jacob/bryn-build`
-Handoff: `JACOB-HANDOFF.md`
-Slack: #internal-rotary (C0AGHLNCL6S)
-
-- [ ] System prompt builder (`src/lib/bryn/system-prompt.ts`)
-- [ ] Tool definitions (`src/lib/bryn/tools.ts`)
-- [ ] Tool executors (`src/lib/bryn/tool-executors.ts`)
-- [ ] Chat API route (`src/app/api/bryn/chat/route.ts`)
-- [ ] Thread API routes (`src/app/api/bryn/threads/`)
-- [ ] Audit logging (`src/lib/bryn/audit.ts`)
-
-### Terminal 4B: Bryn Chat UI — QUEUED (Jacob, after 4A)
-- [ ] Chat page (`src/app/portal/bryn/page.tsx`)
-- [ ] Chat hook (`src/hooks/use-bryn-chat.ts`)
-- [ ] Message components (`src/components/bryn/`)
-- [ ] Floating widget (`src/components/bryn/bryn-widget.tsx`)
+_(none currently)_
 
 ---
 
