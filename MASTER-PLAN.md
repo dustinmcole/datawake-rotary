@@ -23,7 +23,9 @@
 11. [Domain & Deployment](#11-domain--deployment)
 12. [Parallel Build Plan](#12-parallel-build-plan)
 13. [Open Questions](#13-open-questions)
-14. [Status Log](#14-status-log)
+14. [Roger Developer Agent](#14-roger-developer-agent)
+15. [Status Log](#15-status-log)
+16. [Planned Feature Sets](#16-planned-feature-sets)
 
 ---
 
@@ -124,6 +126,16 @@ fullertonrotaryclub.com
 │   ├── /uncorked-hub/committee .. Committee directory
 │   └── /uncorked-hub/vendor-interest . Public submission review
 │
+├── /board ....................... 🔒 Board Management Portal (board members + officers)
+│   ├── /board ................... Board dashboard (upcoming meetings, open action items)
+│   ├── /board/meetings .......... Meeting agendas, minutes, attendance
+│   ├── /board/resolutions ....... Board votes, motions, and resolutions log
+│   ├── /board/documents ......... Document library (bylaws, policies, standing rules)
+│   ├── /board/officers .......... Officer directory with terms and responsibilities
+│   ├── /board/action-items ...... Action item tracker (assignee, due date, status)
+│   ├── /board/budget ............ Annual budget overview + YTD vs budget
+│   └── /board/calendar .......... Governance calendar (terms, elections, deadlines)
+│
 └── /api ......................... API routes
     ├── /api/auth/[...] .......... Auth endpoints
     ├── /api/members/[...] ....... Member CRUD
@@ -133,8 +145,16 @@ fullertonrotaryclub.com
     ├── /api/announcements/[...] .. Announcements
     ├── /api/pages/[...] ......... CMS content
     ├── /api/bryn/[...] .......... AI chat endpoints
-    └── /api/uncorked/[...] ...... Existing Uncorked API (contacts, meetings, etc.)
+    ├── /api/uncorked/[...] ...... Existing Uncorked API (contacts, meetings, etc.)
+    ├── /api/messaging/[...] ..... SMS broadcast (send, history, opt-outs)
+    ├── /api/community-crm/[...] . External community contacts
+    ├── /api/membership-pipeline/[...] . Prospect/recruitment pipeline
+    └── /api/board/[...] ......... Board management data
 ```
+
+**New route groups planned:**
+- `(board)/` — Board Management Portal, `board_member`+ access, blue/silver palette
+- Admin subpages for SMS, Community CRM, and Membership Pipeline under `/admin/*`
 
 ---
 
@@ -185,6 +205,10 @@ fullertonrotaryclub.com
 | Bryn (basic Q&A) | Full | Full | Full | Full | Full | Full | Full | — |
 | Admin panel | Full | Full | Partial | Partial | — | — | — | — |
 | Settings | Full | — | — | — | — | — | — | — |
+| **SMS Broadcast** | **Full** | **Full** | **—** | **—** | **—** | **—** | **—** | **—** |
+| **Community CRM** | **Full** | **Full** | **View** | **—** | **—** | **—** | **—** | **—** |
+| **Membership Pipeline** | **Full** | **Full** | **View** | **—** | **—** | **—** | **—** | **—** |
+| **Board Portal** | **Full** | **Full** | **Full** | **—** | **—** | **—** | **—** | **—** |
 
 ### Implementation
 
@@ -334,6 +358,173 @@ This is the **existing app** currently at app-sigma-seven-46.vercel.app, moved t
 - Event participation
 - Committee activity
 - Financial overview (link to Uncorked budget for Uncorked data)
+
+---
+
+### 5E. SMS Broadcast (`/admin/messaging`)
+
+**Planned feature — not yet built.**
+
+Authorized users can send text messages to targeted groups of members.
+
+**Access:** `club_admin`, `super_admin` only.
+
+**Send targets:**
+- All members
+- Board members only
+- Specific committee members
+- Members matching a filter (classification, status, etc.)
+- Custom list (paste phone numbers or select from directory)
+
+**Features:**
+- Compose & preview message before sending
+- Character count with MMS/SMS boundary indicator
+- Scheduled sending (send now vs. schedule for specific time)
+- Delivery report (sent, delivered, failed by recipient)
+- Full send history with filter/search
+- Opt-out management: members can reply STOP, opt-outs respected and tracked
+- Opt-in confirmation for new members (first text includes opt-out instructions)
+
+**Tech:** Twilio (SMS/MMS). Webhook handler for delivery receipts and STOP replies.
+
+**DB Tables:** `text_broadcasts`, `text_broadcast_recipients`, `text_opt_outs`
+
+**Constraints:**
+- Cannot send to opted-out numbers
+- Must comply with TCPA (prior consent — members implicitly consent as part of registration acknowledgment)
+- Rate limiting to prevent accidental mass sends
+
+---
+
+### 5F. Community CRM (`/admin/community-crm`)
+
+**Planned feature — not yet built.**
+
+A lightweight CRM for tracking community contacts — people the club engages with who are not (yet) members. Think community partners, event guests, local business contacts, referrals, past speakers, etc.
+
+**Access:** `club_admin`, `super_admin` can edit. `board_member` can view.
+
+**Contact record fields:**
+- Name, email, phone, company/org, title
+- Type: community partner, event guest, speaker, referral, business contact, other
+- Tags (freeform)
+- Source (how did we meet them?)
+- Notes / relationship history
+- Status: cold, warm, active, inactive
+- Assigned to (which member manages this relationship?)
+- Last contact date
+
+**Features:**
+- Contact list with search, filter by type/status/tags
+- Timeline/activity log per contact (notes, calls, emails, meetings)
+- Add activity: log a touchpoint manually
+- Bulk import (CSV)
+- Export to CSV
+- Relationship linkage: can flag a community contact as "referred by [member]"
+- Handoff: if a community contact becomes a prospective member, promote them to the Membership Pipeline
+
+**DB Tables:** `community_contacts`, `community_contact_activities`
+
+---
+
+### 5G. Membership Pipeline / Recruitment CRM (`/admin/membership-pipeline`)
+
+**Planned feature — not yet built.**
+
+A CRM specifically for tracking prospective members through the Rotary induction pipeline. Separate from the general Community CRM because it has a defined stage-gated process.
+
+**Access:** `club_admin`, `super_admin` can edit. `board_member` can view. Potentially a future `membership_chair` role.
+
+**Pipeline stages:**
+1. **Identified** — Someone flagged as a potential member
+2. **Reached Out** — Initial contact made
+3. **Visited** — Attended a meeting as a guest
+4. **Sponsor Found** — An existing member agreed to sponsor them
+5. **Application Submitted** — Formal application received
+6. **Board Approved** — Board voted to approve
+7. **Inducted** — New member! (triggers creation of member account)
+8. **Declined / Withdrawn** — Didn't proceed (track reason)
+
+**Prospect record fields:**
+- Name, email, phone, company, classification (proposed Rotary classification)
+- Source: member referral, walk-in, community event, web inquiry
+- Referred by (link to existing member)
+- Sponsor (assigned sponsor/champion — existing member)
+- Current stage
+- Stage history with dates and notes
+- Next action + due date
+- Notes
+
+**Features:**
+- Kanban board view (drag cards across pipeline stages)
+- List view with filters (by stage, sponsor, date, classification)
+- Activity log per prospect
+- Assign sponsor to prospect
+- "Convert to Member" action at Inducted stage (creates user + sends Clerk invite)
+- Pull from Membership Inquiries: incoming `/join` form submissions can be promoted to pipeline
+- Pull from Community CRM: community contacts can be promoted to pipeline
+- Reports: conversion rates, time-in-stage, source attribution
+
+**DB Tables:** `prospects`, `prospect_activities`
+
+---
+
+### 5H. Board Management Portal (`/board/*`)
+
+**Planned feature — not yet built.**
+
+A dedicated board-only space for governance and operations — similar in spirit to the Uncorked Planning Hub, but for the board of directors. Separate route group with its own layout and design.
+
+**Access:** `board_member`, `club_admin`, `super_admin`. Members cannot access.
+
+**Design:** Professional/civic palette — blue/silver/white, formal feel. Not the warm community palette of the portal.
+
+**Modules:**
+
+**Dashboard (`/board`):**
+- Upcoming board meetings
+- Open action items (mine + all)
+- Pending resolutions for vote
+- Officer terms ending within 60 days
+- Quick links to documents and minutes
+
+**Meetings (`/board/meetings`):**
+- Meeting list (past and upcoming)
+- Per meeting: agenda, attendees, minutes (rich text), attachments
+- Create meeting, generate agenda template
+- Mark attendance for board members
+- Extract action items from meeting notes (Bryn integration)
+
+**Resolutions & Voting (`/board/resolutions`):**
+- Log of board motions, votes, and outcomes
+- Fields: motion text, mover, seconder, vote count (Y/N/Abstain), outcome, meeting date
+- Searchable history
+
+**Documents (`/board/documents`):**
+- Categorized library: Bylaws, Standing Rules, Policies, Minutes Archive, Templates
+- Upload, version, download
+- Public vs. board-only visibility flag
+
+**Officers (`/board/officers`):**
+- Directory of current officers with photos, titles, terms, and contact info
+- Historical officer list (past presidents, etc.)
+- Term calendar: who's up for re-election and when
+
+**Action Items (`/board/action-items`):**
+- Kanban or list view of all open board action items
+- Assignee, due date, source meeting, status (open, in progress, done, deferred)
+- My items vs. all items toggle
+
+**Budget (`/board/budget`):**
+- Annual budget by category (admin, programs, service, fundraising, Uncorked)
+- YTD actuals vs. budget (manual entry or future integration)
+- Surplus/deficit tracking
+
+**Governance Calendar (`/board/calendar`):**
+- Annual governance timeline: elections, officer transitions, district deadlines, reporting dates
+- Integration with club events calendar
+
+**DB Tables:** `board_meetings`, `board_meeting_attendees`, `board_resolutions`, `board_documents`, `board_action_items`, `officer_terms`
 
 ---
 
@@ -591,9 +782,204 @@ CREATE TABLE membership_inquiries (
 );
 ```
 
-### Total Tables: 21
+### Total Tables: 21 (current) + 17 planned
 - 8 existing (Uncorked)
-- 13 new (platform + member portal + CMS + AI)
+- 13 built (platform + member portal + CMS + AI)
+- 17 planned (SMS, Community CRM, Membership Pipeline, Board Portal — see Section 16)
+
+### Planned Tables (new feature sets)
+
+```sql
+-- ============================================
+-- SMS Broadcast (Section 16A)
+-- ============================================
+CREATE TABLE text_broadcasts (
+  id VARCHAR(128) PRIMARY KEY,
+  subject VARCHAR(256) DEFAULT '',          -- internal label
+  body TEXT NOT NULL,                        -- SMS message text
+  target_type VARCHAR(64) NOT NULL,          -- all_members, board, committee, custom
+  target_filter TEXT DEFAULT '',             -- JSON: filter criteria or comma-sep IDs
+  status VARCHAR(32) DEFAULT 'draft',        -- draft, scheduled, sending, sent, failed
+  scheduled_at TIMESTAMP,
+  sent_at TIMESTAMP,
+  sent_by VARCHAR(128) REFERENCES users(id),
+  total_recipients INTEGER DEFAULT 0,
+  delivered_count INTEGER DEFAULT 0,
+  failed_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE text_broadcast_recipients (
+  id VARCHAR(128) PRIMARY KEY,
+  broadcast_id VARCHAR(128) NOT NULL REFERENCES text_broadcasts(id) ON DELETE CASCADE,
+  user_id VARCHAR(128) REFERENCES users(id),
+  phone VARCHAR(32) NOT NULL,
+  status VARCHAR(32) DEFAULT 'pending',      -- pending, sent, delivered, failed, opted_out
+  twilio_sid VARCHAR(128),
+  error_message TEXT,
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE text_opt_outs (
+  id VARCHAR(128) PRIMARY KEY,
+  phone VARCHAR(32) UNIQUE NOT NULL,
+  user_id VARCHAR(128) REFERENCES users(id),
+  opted_out_at TIMESTAMP DEFAULT NOW(),
+  reason VARCHAR(64) DEFAULT 'STOP'          -- STOP, admin_remove, user_request
+);
+
+-- ============================================
+-- Community CRM (Section 16B)
+-- ============================================
+CREATE TABLE community_contacts (
+  id VARCHAR(128) PRIMARY KEY,
+  first_name VARCHAR(128) NOT NULL,
+  last_name VARCHAR(128) NOT NULL,
+  email VARCHAR(256) DEFAULT '',
+  phone VARCHAR(64) DEFAULT '',
+  company VARCHAR(256) DEFAULT '',
+  title VARCHAR(128) DEFAULT '',
+  contact_type VARCHAR(64) DEFAULT 'other',  -- community_partner, event_guest, speaker, referral, business, other
+  tags TEXT DEFAULT '[]',                    -- JSON array
+  source VARCHAR(256) DEFAULT '',
+  status VARCHAR(32) DEFAULT 'warm',         -- cold, warm, active, inactive
+  assigned_to VARCHAR(128) REFERENCES users(id),
+  referred_by VARCHAR(128) REFERENCES users(id),
+  notes TEXT DEFAULT '',
+  last_contact_date DATE,
+  created_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE community_contact_activities (
+  id VARCHAR(128) PRIMARY KEY,
+  contact_id VARCHAR(128) NOT NULL REFERENCES community_contacts(id) ON DELETE CASCADE,
+  activity_type VARCHAR(64) NOT NULL,        -- note, call, email, meeting, event, other
+  description TEXT NOT NULL,
+  activity_date DATE NOT NULL,
+  logged_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- Membership Pipeline (Section 16C)
+-- ============================================
+CREATE TABLE prospects (
+  id VARCHAR(128) PRIMARY KEY,
+  first_name VARCHAR(128) NOT NULL,
+  last_name VARCHAR(128) NOT NULL,
+  email VARCHAR(256) DEFAULT '',
+  phone VARCHAR(64) DEFAULT '',
+  company VARCHAR(256) DEFAULT '',
+  classification VARCHAR(128) DEFAULT '',    -- proposed Rotary classification
+  source VARCHAR(64) DEFAULT 'referral',     -- referral, walk_in, community_event, web_inquiry, crm_import
+  referred_by VARCHAR(128) REFERENCES users(id),
+  sponsor_id VARCHAR(128) REFERENCES users(id),
+  stage VARCHAR(64) DEFAULT 'identified',   -- identified, reached_out, visited, sponsor_found, applied, board_approved, inducted, declined
+  stage_updated_at TIMESTAMP DEFAULT NOW(),
+  next_action TEXT DEFAULT '',
+  next_action_due DATE,
+  converted_user_id VARCHAR(128) REFERENCES users(id), -- set when inducted
+  source_inquiry_id VARCHAR(128),            -- FK to membership_inquiries if from web form
+  source_contact_id VARCHAR(128),            -- FK to community_contacts if promoted from CRM
+  notes TEXT DEFAULT '',
+  created_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE prospect_activities (
+  id VARCHAR(128) PRIMARY KEY,
+  prospect_id VARCHAR(128) NOT NULL REFERENCES prospects(id) ON DELETE CASCADE,
+  activity_type VARCHAR(64) NOT NULL,        -- stage_change, note, call, email, meeting, visit, other
+  from_stage VARCHAR(64),
+  to_stage VARCHAR(64),
+  description TEXT NOT NULL,
+  activity_date DATE NOT NULL,
+  logged_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- ============================================
+-- Board Management Portal (Section 16D)
+-- ============================================
+CREATE TABLE board_meetings (
+  id VARCHAR(128) PRIMARY KEY,
+  title VARCHAR(256) NOT NULL,
+  meeting_date DATE NOT NULL,
+  start_time VARCHAR(8) DEFAULT '',
+  location VARCHAR(512) DEFAULT '',
+  agenda TEXT DEFAULT '',                    -- markdown
+  minutes TEXT DEFAULT '',                   -- markdown
+  status VARCHAR(32) DEFAULT 'scheduled',   -- scheduled, completed, cancelled
+  created_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE board_meeting_attendees (
+  id VARCHAR(128) PRIMARY KEY,
+  meeting_id VARCHAR(128) NOT NULL REFERENCES board_meetings(id) ON DELETE CASCADE,
+  user_id VARCHAR(128) NOT NULL REFERENCES users(id),
+  attended BOOLEAN DEFAULT FALSE,
+  UNIQUE(meeting_id, user_id)
+);
+
+CREATE TABLE board_resolutions (
+  id VARCHAR(128) PRIMARY KEY,
+  meeting_id VARCHAR(128) REFERENCES board_meetings(id),
+  motion_text TEXT NOT NULL,
+  mover_id VARCHAR(128) REFERENCES users(id),
+  seconder_id VARCHAR(128) REFERENCES users(id),
+  votes_yes INTEGER DEFAULT 0,
+  votes_no INTEGER DEFAULT 0,
+  votes_abstain INTEGER DEFAULT 0,
+  outcome VARCHAR(32) DEFAULT 'pending',     -- passed, failed, tabled, withdrawn, pending
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE board_documents (
+  id VARCHAR(128) PRIMARY KEY,
+  title VARCHAR(512) NOT NULL,
+  category VARCHAR(64) DEFAULT 'general',   -- bylaws, standing_rules, policies, minutes, templates, general
+  description TEXT DEFAULT '',
+  file_url VARCHAR(1024) NOT NULL,           -- hosted file URL (Vercel Blob or similar)
+  file_name VARCHAR(256) NOT NULL,
+  file_size INTEGER,
+  visibility VARCHAR(32) DEFAULT 'board',   -- board, members, public
+  version INTEGER DEFAULT 1,
+  uploaded_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE board_action_items (
+  id VARCHAR(128) PRIMARY KEY,
+  title VARCHAR(512) NOT NULL,
+  description TEXT DEFAULT '',
+  assignee_id VARCHAR(128) REFERENCES users(id),
+  source_meeting_id VARCHAR(128) REFERENCES board_meetings(id),
+  status VARCHAR(32) DEFAULT 'open',        -- open, in_progress, done, deferred
+  due_date DATE,
+  completed_at TIMESTAMP,
+  created_by VARCHAR(128) REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE officer_terms (
+  id VARCHAR(128) PRIMARY KEY,
+  user_id VARCHAR(128) NOT NULL REFERENCES users(id),
+  title VARCHAR(128) NOT NULL,               -- President, VP, Secretary, Treasurer, Sergeant-at-Arms, etc.
+  start_date DATE NOT NULL,
+  end_date DATE,
+  active BOOLEAN DEFAULT TRUE,
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
 
 ---
 
@@ -615,17 +1001,25 @@ CREATE TABLE membership_inquiries (
 | Rich Text | Tiptap or MDXRemote | NEW — for CMS pages |
 | Date Utilities | date-fns | Already in use |
 | Email (optional) | Resend or React Email | NEW — for announcements |
+| SMS | Twilio | PLANNED — SMS broadcast feature |
+| File Storage | Vercel Blob | PLANNED — board document uploads |
 | Hosting | Vercel | Already in use |
 | Domain | fullertonrotaryclub.com | Needs DNS transfer from Wix |
 
-### New Dependencies to Add
+### Current Dependencies (added)
 ```
 @clerk/nextjs           # Auth
 ai                      # Vercel AI SDK (streaming)
 @ai-sdk/anthropic       # Anthropic provider for AI SDK
-@tiptap/react           # Rich text editor for CMS (optional)
+```
+
+### Planned Dependencies (new feature sets)
+```
+twilio                  # SMS broadcast (Section 16A)
+@vercel/blob            # Board document file storage (Section 16D)
+resend                  # Transactional email — announcements, invite confirmations
+@tiptap/react           # Rich text editor — board meeting agendas/minutes
 @tiptap/starter-kit     # Tiptap extensions
-resend                  # Transactional email (optional)
 ```
 
 ---
@@ -688,6 +1082,32 @@ Oct 17 • 5-9 PM
 📋 Vendor Applications
 ─────────────────────────
 [← Back to Portal]
+```
+
+### Board Portal Navigation (sidebar — blue/silver, planned)
+```
+[🏛️] Board Portal
+Fullerton Rotary Club
+─────────────────────────
+📊 Dashboard
+📅 Meetings
+📜 Resolutions
+📁 Documents
+👔 Officers
+✅ Action Items
+💰 Budget
+🗓️ Governance Calendar
+─────────────────────────
+[← Back to Portal]
+```
+
+### Admin Navigation additions (planned)
+```
+[existing admin nav items...]
+─────────────────────────
+📱 Messaging (SMS)
+🏘️ Community CRM
+🎯 Membership Pipeline
 ```
 
 ### Design System
@@ -771,6 +1191,11 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/portal
 
 # New — Email (optional)
 RESEND_API_KEY=re_...
+
+# Planned — SMS Broadcast (Section 16A)
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=+1...
 ```
 
 ---
@@ -873,7 +1298,69 @@ Wave 4:  T4B (Bryn chat UI) — AFTER 4A
 
 ---
 
-## 14. Status Log
+## 14. Roger Developer Agent
+
+### Purpose
+
+Roger is a **super_admin-only developer agent** built into the Planning Hub at `/admin/planning`. While Bryn serves club members with a warm, service-oriented personality, Roger serves platform developers with direct, technical communication.
+
+### How Roger Differs from Bryn
+
+| Aspect | Bryn | Roger |
+|--------|------|-------|
+| **Audience** | All members (role-filtered) | super_admin only |
+| **Personality** | Warm, service-oriented, "we" language | Direct, technical, no-fluff |
+| **Contexts** | member, website, operations, uncorked | developer (single context) |
+| **Tools** | 17 (read + write, confirmation-gated) | 5 (read-only) |
+| **Access** | Portal (/portal/bryn) + Uncorked Hub | Admin only (/admin/planning, Roger tab) |
+| **Thread Persistence** | Yes (DB-backed threads) | No (session-only, v1) |
+| **Model** | Claude Sonnet 4.6 | Claude Sonnet 4.6 |
+
+### Roger's Tools (5)
+
+| Tool | Description | Access |
+|------|-------------|--------|
+| `query_database` | Execute read-only SQL (SELECT/WITH only, 100 row limit) | Read-only |
+| `get_table_stats` | Row counts for all 20 database tables | Read-only |
+| `get_table_schema` | Column info for a specific table (via information_schema) | Read-only |
+| `get_environment_status` | Which env vars are set (boolean only, never values) | Read-only |
+| `get_platform_config` | Platform config summary (stack, routes, roles, agents) | Read-only |
+
+### Security
+
+- **Auth gate:** Clerk `auth()` + `hasRole(userId, "super_admin")` — returns 403 for non-super_admin
+- **Read-only:** All tools are read-only. Write operations blocked at query level.
+- **Query validation:** `query_database` validates SELECT/WITH prefix, blocks INSERT/UPDATE/DELETE/DROP/ALTER/TRUNCATE/CREATE/GRANT/REVOKE keywords, wraps in subquery for safe LIMIT enforcement
+- **No env exposure:** Environment status returns booleans only, never actual values
+
+### Key Files
+
+```
+src/lib/roger/system-prompt.ts     — Roger's system prompt builder
+src/lib/roger/tools.ts             — 5 tool definitions (Vercel AI SDK)
+src/lib/roger/tool-executors.ts    — Tool implementation (DB queries, config)
+src/app/api/roger/chat/route.ts    — Streaming chat API (super_admin gated)
+src/hooks/use-roger-chat.ts        — Client chat hook (SSE streaming)
+src/components/roger/chat-message.tsx — Chat message component
+src/app/admin/planning/_components/roger-chat-tab.tsx — Roger tab UI
+```
+
+### Planning Hub Overview
+
+The Planning Hub (`/admin/planning`) is a super_admin-only command center with 6 tabs:
+
+| Tab | Content | Data Source |
+|-----|---------|-------------|
+| Roles & Permissions | RBAC matrix, role hierarchy, route access | Static |
+| Build Status | 5 terminal cards, module checklist, progress | Static |
+| Bryn Config | Identity, personality, tools by context, agent rules | Static |
+| Environment | Deployment info, integration status, env var checklist | Live API |
+| Analytics | KPI cards, DB table row counts | Live API |
+| Roger | Developer agent chat with read-only DB tools | Live API (streaming) |
+
+---
+
+## 15. Status Log
 
 | Date | Action | Status |
 |------|--------|--------|
@@ -891,6 +1378,110 @@ Wave 4:  T4B (Bryn chat UI) — AFTER 4A
 | 2026-02-28 | Terminal 3 completed — Public website: 8 (rotary)/* pages, rotary header/footer, 4 API routes, CMS editor, seed script | Done |
 | 2026-02-28 | Terminal 5 completed — Uncorked migration verified, admin pages built | Done |
 | 2026-02-28 | Bryn config governance formalized — AGENTS.md + openclaw.json updated | Done |
-| | Terminal 4A: Bryn Agent Backend (Opus) | Next |
-| | Terminal 4B: Bryn Chat UI (Sonnet) | After 4A |
+| 2026-02-28 | Terminal 4A+4B: Bryn AI Assistant (backend + chat UI) | Done |
+| 2026-02-28 | Roger developer agent + Planning Hub — 6-tab admin command center, 5 Roger tools, streaming chat | Done |
+| 2026-02-28 | Planned feature sets added: SMS Broadcast, Community CRM, Membership Pipeline, Board Portal | Planned |
 | | Integration testing + polish | Final |
+
+---
+
+## 16. Planned Feature Sets
+
+These feature sets are planned but not yet built. Each will become one or more future build terminals once the core platform is stable.
+
+### 16A. SMS Broadcast
+
+**Status:** Planned
+**Detailed spec:** Section 5E
+**Primary route:** `/admin/messaging`
+**Tech:** Twilio
+**New tables:** `text_broadcasts`, `text_broadcast_recipients`, `text_opt_outs`
+**New env vars:** `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
+
+**Scope of work:**
+- `app/admin/messaging/page.tsx` — compose UI, recipient targeting, history
+- `app/api/messaging/route.ts` — create/send broadcast
+- `app/api/messaging/[id]/route.ts` — get status, recipient list
+- `app/api/messaging/webhooks/twilio/route.ts` — delivery receipts + STOP handling
+- `lib/queries/messaging.ts` — broadcast queries
+- Admin sidebar: add Messaging nav item
+
+---
+
+### 16B. Community CRM
+
+**Status:** Planned
+**Detailed spec:** Section 5F
+**Primary route:** `/admin/community-crm`
+**New tables:** `community_contacts`, `community_contact_activities`
+
+**Scope of work:**
+- `app/admin/community-crm/page.tsx` — contact list with search/filter
+- `app/admin/community-crm/[id]/page.tsx` — contact detail + activity timeline
+- `app/api/community-crm/route.ts` — GET list, POST create
+- `app/api/community-crm/[id]/route.ts` — GET, PATCH, DELETE
+- `app/api/community-crm/[id]/activities/route.ts` — log activity
+- `lib/queries/community-crm.ts` — contact queries
+- "Promote to Pipeline" action: creates a prospect from a community contact
+- Admin sidebar: add Community CRM nav item
+
+---
+
+### 16C. Membership Pipeline
+
+**Status:** Planned
+**Detailed spec:** Section 5G
+**Primary route:** `/admin/membership-pipeline`
+**New tables:** `prospects`, `prospect_activities`
+
+**Scope of work:**
+- `app/admin/membership-pipeline/page.tsx` — Kanban board + list view
+- `app/admin/membership-pipeline/[id]/page.tsx` — prospect detail + activity timeline
+- `app/api/membership-pipeline/route.ts` — GET list, POST create
+- `app/api/membership-pipeline/[id]/route.ts` — GET, PATCH (incl. stage transitions), DELETE
+- `app/api/membership-pipeline/[id]/activities/route.ts` — log activity
+- `lib/queries/membership-pipeline.ts` — prospect queries
+- "Convert to Member" action: triggers Clerk invite, marks prospect as inducted
+- "Import from Inquiries" — pull unprocessed `/join` form submissions
+- Admin sidebar: add Membership Pipeline nav item
+
+---
+
+### 16D. Board Management Portal
+
+**Status:** Planned
+**Detailed spec:** Section 5H
+**Primary route group:** `(board)/` — separate layout, blue/silver palette
+**New tables:** `board_meetings`, `board_meeting_attendees`, `board_resolutions`, `board_documents`, `board_action_items`, `officer_terms`
+**New env vars:** none (Vercel Blob uses existing Vercel project credentials)
+
+**Scope of work:**
+- `app/(board)/layout.tsx` — board layout with sidebar, `requireAnyRole(["board_member", "club_admin", "super_admin"])`
+- `app/(board)/board/page.tsx` — dashboard
+- `app/(board)/board/meetings/page.tsx` + `[id]/page.tsx`
+- `app/(board)/board/resolutions/page.tsx`
+- `app/(board)/board/documents/page.tsx`
+- `app/(board)/board/officers/page.tsx`
+- `app/(board)/board/action-items/page.tsx`
+- `app/(board)/board/budget/page.tsx`
+- `app/(board)/board/calendar/page.tsx`
+- Full API routes at `app/api/board/**`
+- `lib/queries/board.ts` — all board queries
+- Portal sidebar: add Board Portal link for `board_member`+ users
+- Rich text (Tiptap) for meeting agendas and minutes
+- File upload (Vercel Blob) for board documents
+
+---
+
+### Priority / Sequencing
+
+| Feature | Build Priority | Dependency | Estimated Complexity |
+|---------|:-:|---------|:-:|
+| SMS Broadcast | High — high member value, admin-only | None | Medium |
+| Membership Pipeline | High — core club ops | None | Medium |
+| Community CRM | Medium | None (can link to pipeline later) | Medium |
+| Board Management Portal | Medium — board-facing | None | High (many modules) |
+
+**Recommended build order:** SMS → Membership Pipeline → Community CRM → Board Portal
+
+Each feature set is self-contained and can be built in a single terminal session. No cross-dependencies between the four new feature sets.

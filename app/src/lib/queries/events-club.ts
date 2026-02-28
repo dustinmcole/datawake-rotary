@@ -36,7 +36,7 @@ export async function getApprovedPublicEvents(): Promise<ClubEvent[]> {
   return db
     .select()
     .from(events)
-    .where(gte(events.date, today))
+    .where(and(gte(events.date, today), eq(events.status, "approved"), eq(events.isPublic, true)))
     .orderBy(events.date);
 }
 

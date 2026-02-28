@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { hasAnyRole } from "@/lib/auth";
+import { getUserByClerkId } from "@/lib/queries/users";
 import { getAllAnnouncements, createAnnouncement } from "@/lib/queries/announcements";
 import { generateId } from "@/lib/utils";
 
@@ -27,6 +28,9 @@ export async function POST(req: Request) {
   if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
+    const dbUser = await getUserByClerkId(userId);
+    if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
     const body = await req.json();
     const { title, content, category, pinned, publish } = body;
 
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
       title,
       content,
       category: category ?? "general",
-      authorId: userId,
+      authorId: dbUser.id,
       pinned: pinned ?? false,
       publishedAt: publish ? new Date() : null,
     });

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { hasAnyRole } from "@/lib/auth";
+import { getUserByClerkId } from "@/lib/queries/users";
 import { getClubEventById, updateClubEvent, approveClubEvent, deleteClubEvent } from "@/lib/queries/events-club";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -29,7 +30,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     // Special action: approve
     if (body.action === "approve") {
-      const evt = await approveClubEvent(id, userId);
+      const dbUser = await getUserByClerkId(userId);
+      if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
+      const evt = await approveClubEvent(id, dbUser.id);
       return NextResponse.json(evt);
     }
     // Special action: reject/cancel

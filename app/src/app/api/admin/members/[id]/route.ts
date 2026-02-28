@@ -26,13 +26,20 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const body = await req.json();
 
+  // Allowlist fields to prevent mass assignment
+  const ALLOWED_FIELDS = ["firstName", "lastName", "phone", "company", "classification", "memberType", "status", "bio", "address", "photoUrl", "roles"] as const;
+  const data: Record<string, unknown> = {};
+  for (const key of ALLOWED_FIELDS) {
+    if (key in body) data[key] = body[key];
+  }
+
   // Serialize roles array to JSON string if provided
-  if (Array.isArray(body.roles)) {
-    body.roles = JSON.stringify(body.roles);
+  if (Array.isArray(data.roles)) {
+    data.roles = JSON.stringify(data.roles);
   }
 
   try {
-    const updated = await updateUser(id, body);
+    const updated = await updateUser(id, data);
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(updated);
   } catch (err) {

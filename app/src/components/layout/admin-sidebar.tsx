@@ -13,6 +13,7 @@ import {
   Globe,
   BarChart3,
   Settings,
+  Compass,
   ArrowLeft,
   Menu,
   X,
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/website", label: "Website (CMS)", icon: Globe },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/uncorked-hub", label: "Planning Hub", icon: Compass },
 ];
 
 export function AdminSidebar() {

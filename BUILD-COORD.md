@@ -213,6 +213,18 @@
 
 ---
 
+### Proxy Migration — DONE
+- **Next.js 16 deprecation resolved:** `src/middleware.ts` → `src/proxy.ts`
+- No logic changes — `clerkMiddleware()` default export works identically in proxy.ts
+- Build output now shows `ƒ Proxy (Middleware)` (correct) instead of deprecation warning
+- TypeScript: clean. Build: clean (71 routes).
+
+**Files changed:**
+- src/proxy.ts (new — identical to old middleware.ts)
+- src/middleware.ts (deleted)
+
+---
+
 ## In Progress
 
 _(none currently)_

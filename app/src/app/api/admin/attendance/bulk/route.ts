@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { hasAnyRole } from "@/lib/auth";
+import { getUserByClerkId } from "@/lib/queries/users";
 import { db } from "@/lib/db/client";
 import { attendance } from "@/lib/db/schema";
 import { generateId } from "@/lib/utils";
@@ -22,12 +23,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "date and attendees required" }, { status: 400 });
     }
 
+    const dbUser = await getUserByClerkId(userId);
+    if (!dbUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
     const records = attendees.map((uid: string) => ({
       id: generateId(),
       userId: uid,
       date,
       type,
-      recordedBy: userId,
+      recordedBy: dbUser.id,
       notes: "",
     }));
 
