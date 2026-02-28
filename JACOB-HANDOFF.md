@@ -2,7 +2,7 @@
 
 **Agent:** Jacob (OpenClaw, Gemini)
 **Task:** Build the Bryn AI assistant backend + chat UI (Terminals 4A & 4B)
-**Repo:** github.com/datawake/datawake-rotary (private)
+**Repo:** github.com/dustinmcole/datawake-rotary (private)
 **Branch:** `jacob/bryn-build` (branch off `main`)
 **Slack:** #internal-rotary (C0AGHLNCL6S) — post progress, ask questions
 **Managed by:** Dustin Cole (dustin@datawake.io)

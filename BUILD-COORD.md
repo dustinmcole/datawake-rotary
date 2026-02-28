@@ -187,7 +187,24 @@
 
 ## In Progress
 
-_(none currently)_
+### Terminal 4A: Bryn Agent Backend — ASSIGNED (Jacob)
+Agent: Jacob (OpenClaw, Gemini)
+Branch: `jacob/bryn-build`
+Handoff: `JACOB-HANDOFF.md`
+Slack: #internal-rotary (C0AGHLNCL6S)
+
+- [ ] System prompt builder (`src/lib/bryn/system-prompt.ts`)
+- [ ] Tool definitions (`src/lib/bryn/tools.ts`)
+- [ ] Tool executors (`src/lib/bryn/tool-executors.ts`)
+- [ ] Chat API route (`src/app/api/bryn/chat/route.ts`)
+- [ ] Thread API routes (`src/app/api/bryn/threads/`)
+- [ ] Audit logging (`src/lib/bryn/audit.ts`)
+
+### Terminal 4B: Bryn Chat UI — QUEUED (Jacob, after 4A)
+- [ ] Chat page (`src/app/portal/bryn/page.tsx`)
+- [ ] Chat hook (`src/hooks/use-bryn-chat.ts`)
+- [ ] Message components (`src/components/bryn/`)
+- [ ] Floating widget (`src/components/bryn/bryn-widget.tsx`)
 
 ---
 
