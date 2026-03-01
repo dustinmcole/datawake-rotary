@@ -31,19 +31,31 @@
 
 ## 1. Vision
 
-One unified Next.js application that replaces **three separate systems** with a single, modern platform:
+One unified Next.js application that replaces **three separate systems** and adds a **fourth product** — all in a single codebase:
 
 | What exists today | What replaces it |
 |---|---|
 | **fullertonrotaryclub.com** (Wix) | Public website — club info, events, join, programs |
 | **DACdb** (legacy SaaS) | Member portal — directory, attendance, committees, profile |
 | **Uncorked planning site** (standalone Vercel app) | Integrated module — accessible to Uncorked committee only |
+| **fullertonuncorked.org** (needs rebuild) | Uncorked public event website — tickets, sponsors, vendors, schedule |
+
+### The Four Products
+
+| # | Product | Route Group | Domain | Audience |
+|---|---------|-------------|--------|----------|
+| 1 | **Public Club Website** | `(rotary)/*` | fullertonrotaryclub.com | General public |
+| 2 | **Members Portal** | `/portal/*` | fullertonrotaryclub.com/portal | Authenticated members |
+| 3 | **Uncorked Management Hub** | `/uncorked-hub/*` | fullertonrotaryclub.com/uncorked-hub | Uncorked committee |
+| 4 | **Uncorked Public Website** | `(uncorked)/*` | fullertonuncorked.org | General public (event attendees) |
+
+All four share: one codebase, one database, one deploy, one Clerk auth instance, one component library. Each has its own layout, branding, and navigation. Next.js middleware handles domain-based routing — requests to `fullertonuncorked.org` resolve to the `(uncorked)/*` route group.
 
 Plus two net-new capabilities:
 - **Bryn AI Assistant** — role-aware chatbot embedded in the portal that can edit the public site, pull reports, and answer questions
 - **Event Submission System** — any member can submit new club events without going through a chatbot
 
-The result: a single platform at **fullertonrotaryclub.com** that serves the public, the membership, the board, the Uncorked committee, and the website administrators — all with appropriate access controls.
+The result: a single platform serving four audiences — the general public (club + event), the membership, the board, and the Uncorked committee — all with appropriate access controls.
 
 ---
 
@@ -74,8 +86,8 @@ Standard Wix site with:
 
 **Why replace it:** Wix is limiting, can't integrate with member portal, can't be edited by AI, costs money for no reason.
 
-### fullertonuncorked.org (being rebuilt separately)
-The public-facing Uncorked event website is being rebuilt by another agent. That stays separate for now — it has its own domain and branding. The *planning/committee coordination* site (currently at app-sigma-seven-46.vercel.app) gets absorbed into this unified platform as a permissioned module.
+### fullertonuncorked.org (being unified)
+The public-facing Uncorked event website is now part of this unified platform. It runs as a separate route group `(uncorked)/*` with its own wine-themed layout, header, and footer — served on the `fullertonuncorked.org` domain via Next.js middleware domain routing. The *planning/committee coordination* hub lives at `/uncorked-hub/*` as a permissioned module. Both share the same database (sponsors, vendors, budget, tasks from the existing Uncorked tables).
 
 ---
 
@@ -534,6 +546,38 @@ A dedicated board-only space for governance and operations — similar in spirit
 **DB Tables:** `board_meetings`, `board_meeting_attendees`, `board_resolutions`, `board_documents`, `board_action_items`, `officer_terms`
 
 ---
+
+### 5I. Uncorked Public Event Website (`(uncorked)/*`)
+
+**The public-facing event website for Fullerton Uncorked**, served on `fullertonuncorked.org`. This is a marketing/event site designed to sell tickets, showcase sponsors/vendors, and build hype for the annual fundraiser.
+
+**Existing pages (already built in `(public)/*` route group — rename to `(uncorked)/*`):**
+- Sponsors page — sponsor logos by tier
+- Vendors page — vendor listings with categories
+- Vendor Interest form — public submission for prospective vendors
+
+**New pages needed:**
+
+| Page | Route | Content |
+|------|-------|---------|
+| Home / Landing | `/` | Hero with event branding, date/location, countdown timer, ticket CTA, quick sponsor logos, event highlights |
+| About | `/about` | What is Fullerton Uncorked, history, benefiting Rotary Club of Fullerton, past event photos |
+| Schedule | `/schedule` | Event timeline — gates open, tastings, live entertainment, silent auction, raffle |
+| Tickets | `/tickets` | Ticket tiers (General, VIP, Designated Driver), pricing, Givsum/Zeffy embed or link |
+| Sponsors | `/sponsors` | ✅ Exists — sponsor logos by tier, "become a sponsor" CTA |
+| Vendors | `/vendors` | ✅ Exists — vendor listings, categories, "apply to be a vendor" link |
+| Vendor Interest | `/vendor-interest` | ✅ Exists — public vendor application form |
+| Gallery | `/gallery` | Photo gallery from past events (builds social proof) |
+| FAQ | `/faq` | Common questions — parking, age requirement, rain policy, refunds |
+| Contact | `/contact` | Contact form for general inquiries about the event |
+
+**Design:** Wine-themed palette (wine-950 through wine-50, gold accents, cream backgrounds) — consistent with the existing Uncorked Hub. Premium event feel — think Napa wine festival marketing site.
+
+**Data sources:** Pulls from existing Uncorked database tables — `contacts` (sponsors/vendors), `event_config` (date, location, ticket URLs), `vendor_interest_submissions`. No new tables needed.
+
+**Domain routing:** Next.js middleware detects `fullertonuncorked.org` hostname and routes to `(uncorked)/*` layout. The `(rotary)/uncorked` page on the club site becomes a brief landing that links to fullertonuncorked.org.
+
+**SEO:** Each page gets proper metadata, Open Graph tags, and structured data (Event schema). The site needs to rank for "Fullerton Uncorked", "wine tasting Fullerton", "Fullerton fundraiser".
 
 ## 6. Bryn AI Assistant Integration
 
@@ -1175,7 +1219,7 @@ Fullerton Rotary Club
 |--------|-----------|---------|--------|
 | rotary.datawake.io | Vercel (A → 76.76.21.21) | Live platform | **LIVE** |
 | fullertonrotaryclub.com | Wix (for now) | Club's existing public site | Future cutover |
-| fullertonuncorked.org | Separate deployment | Public Uncorked site | Separate |
+| fullertonuncorked.org | Vercel (same deploy, domain routing) | Public Uncorked event site — `(uncorked)/*` | Planned |
 | app-sigma-seven-46.vercel.app | Vercel alias | Legacy URL (still works) | Active |
 
 ### DNS (Cloudflare — datawake.io zone)
@@ -1399,6 +1443,8 @@ The Planning Hub (`/admin/planning`) is a super_admin-only command center with 6
 | 2026-02-28 | Public website redesign — new hero, gear logo, nonprofit spotlight, events grid | Done |
 | 2026-02-28 | Custom domain rotary.datawake.io — Vercel + Cloudflare A record | Done |
 | 2026-02-28 | Clerk production instance — pk_live_ keys deployed to Vercel | Done |
+| 2026-03-01 | Master plan updated — 4-product architecture: club site, portal, uncorked hub, uncorked public site | Done |
+| 2026-03-01 | Section 5I added — Uncorked Public Event Website spec (10 pages, domain routing, wine theme) | Done |
 | | Clerk DNS records added + Dustin user account created | Pending |
 | | fullertonrotaryclub.com DNS cutover from Wix | Future |
 | | Integration testing + polish | Final |
