@@ -335,6 +335,48 @@ export const membershipInquiries = pgTable("membership_inquiries", {
 });
 
 // ============================================
+// prospects — membership pipeline CRM
+// ============================================
+export const prospects = pgTable("prospects", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  firstName: varchar("first_name", { length: 128 }).notNull(),
+  lastName: varchar("last_name", { length: 128 }).notNull(),
+  email: varchar("email", { length: 256 }).notNull().default(""),
+  phone: varchar("phone", { length: 64 }).notNull().default(""),
+  company: varchar("company", { length: 256 }).notNull().default(""),
+  classification: varchar("classification", { length: 128 }).notNull().default(""),
+  source: varchar("source", { length: 32 }).notNull().default("web_inquiry"), // referral, walk_in, community_event, web_inquiry, crm_import
+  referredBy: varchar("referred_by", { length: 128 }).references(() => users.id),
+  sponsorId: varchar("sponsor_id", { length: 128 }).references(() => users.id),
+  stage: varchar("stage", { length: 32 }).notNull().default("identified"), // identified, reached_out, visited, sponsor_found, applied, board_approved, inducted, declined
+  stageUpdatedAt: timestamp("stage_updated_at").notNull().defaultNow(),
+  nextAction: varchar("next_action", { length: 512 }).notNull().default(""),
+  nextActionDue: varchar("next_action_due", { length: 16 }), // 'YYYY-MM-DD'
+  convertedUserId: varchar("converted_user_id", { length: 128 }).references(() => users.id),
+  sourceInquiryId: varchar("source_inquiry_id", { length: 128 }).references(() => membershipInquiries.id),
+  sourceContactId: varchar("source_contact_id", { length: 128 }).references(() => contacts.id),
+  notes: text("notes").notNull().default(""),
+  createdBy: varchar("created_by", { length: 128 }).references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// prospect_activities — timeline for prospects
+// ============================================
+export const prospectActivities = pgTable("prospect_activities", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  prospectId: varchar("prospect_id", { length: 128 }).notNull().references(() => prospects.id, { onDelete: "cascade" }),
+  activityType: varchar("activity_type", { length: 32 }).notNull(), // stage_change, note, call, email, meeting, visit, other
+  fromStage: varchar("from_stage", { length: 32 }),
+  toStage: varchar("to_stage", { length: 32 }),
+  description: text("description").notNull().default(""),
+  activityDate: timestamp("activity_date").notNull().defaultNow(),
+  loggedBy: varchar("logged_by", { length: 128 }).references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// ============================================
 // checkin_sessions — iPad kiosk attendance sessions
 // ============================================
 export const checkinSessions = pgTable("checkin_sessions", {
