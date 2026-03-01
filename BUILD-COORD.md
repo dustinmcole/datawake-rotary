@@ -271,7 +271,7 @@ _(none currently)_
 - **Task:** Build `/admin/messaging` page and API routes
 - **Scope:** Twilio integration, targeted sends by role/committee/status, message templates, delivery tracking
 - **Assignee:** Rex
-- **Status:** Not started
+- **Status:** Blocked (Directory/Write error)
 - **Files:** src/app/admin/messaging/page.tsx, src/app/api/admin/messaging/route.ts, src/lib/queries/messaging.ts
 - **Acceptance:** Admin can compose, target, and send SMS. Delivery status visible.
 
@@ -304,6 +304,10 @@ _(none currently)_
 ## Known Issues
 
 _(Add any issues that affect other terminals here)_
+
+- **CI Failure on Main:** `npx next lint` is failing on main with `Invalid project directory provided: /home/runner/work/datawake-rotary/datawake-rotary/app/lint`.
+- **Rex write issue:** rex-build-cycle failed to write to `~/Projects/datawake-rotary/app/src/app/admin/messaging/page.tsx` (potential casing issue with `Projects` vs `projects` or missing directory).
+
 
 - The old sidebar.tsx still exists at src/components/layout/sidebar.tsx with paths updated to /uncorked-hub/ but is no longer imported by any layout. Other terminals should use the new sidebar components (portal-sidebar, admin-sidebar, uncorked-sidebar).
 - Terminal 3 deleted the root `app/page.tsx` (which was an auth redirect). The homepage is now always the Rotary public site at `/`. Authenticated users are NOT auto-redirected to `/portal` — they use the "Member Login" link in the header. If this behavior needs to change, it can be added back to the (rotary)/page.tsx as a conditional redirect.
