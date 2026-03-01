@@ -299,6 +299,30 @@ _(none currently)_
 - **Files:** src/app/board/layout.tsx, multiple page.tsx files, src/lib/db/schema.ts (new tables), API routes
 - **Acceptance:** Board members can view meetings, resolutions, documents. Protected by board_member+ role.
 
+### Priority 5: Email Notification System — P1, M
+- **Task:** Build transactional email service for platform events
+- **Scope:** Welcome emails for new members, event RSVP confirmations, attendance reminders (Friday before weekly lunch), announcement digests (weekly opt-in), membership inquiry auto-reply. Use Resend or Nodemailer with a verified domain.
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/lib/email/templates/*.tsx (React Email), src/lib/email/send.ts, src/app/api/email/route.ts, new emailPreferences table in schema.ts
+- **Acceptance:** Emails send on key events. Members can opt out of non-essential emails. Admin can preview templates.
+
+### Priority 6: Member Self-Service Improvements — P2, S
+- **Task:** Add notification preferences and export-my-data to member profile
+- **Scope:** Notification toggle UI (ties into P5 email prefs table), GDPR-friendly data export (JSON download of own profile + attendance + committee memberships)
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/app/portal/profile/page.tsx (extend), src/app/api/members/me/export/route.ts (new)
+- **Acceptance:** Members can manage notifications and download their data.
+
+### Priority 7: Event Photo Gallery — P2, M
+- **Task:** Add photo gallery to events — upload during/after events, display on public event pages
+- **Scope:** Image upload (UploadThing or Cloudinary), gallery grid on /events/[slug], admin moderation queue, member uploads from portal. Thumbnails + lightbox.
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/lib/db/schema.ts (new: eventPhotos table), src/app/api/events-club/[id]/photos/route.ts, src/components/event-gallery.tsx
+- **Acceptance:** Members can upload photos to events. Public visitors see curated gallery. Admin can moderate.
+
 ---
 
 ## Known Issues
