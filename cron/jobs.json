@@ -7,7 +7,7 @@
     "model": "claude-sonnet-4-6",
     "skill": "morning-briefing",
     "channel": "slack:#internal-rotary",
-    "enabled": true,
+    "enabled": false,
     "description": "Daily club agenda, upcoming events, and action items (weekdays 7 AM PT)"
   },
   {
@@ -18,7 +18,7 @@
     "model": "claude-sonnet-4-6",
     "skill": "meeting-follow-up",
     "channel": "slack:#internal-rotary",
-    "enabled": true,
+    "enabled": false,
     "description": "Check for recent meetings and extract action items (every 30 min, business hours)"
   },
   {
@@ -30,7 +30,7 @@
     "skill": "weekly-updates",
     "phase": "draft",
     "channel": "slack:#internal-rotary",
-    "enabled": true,
+    "enabled": false,
     "description": "Draft weekly club status update for leadership review (Saturday 8 PM PT)"
   },
   {
