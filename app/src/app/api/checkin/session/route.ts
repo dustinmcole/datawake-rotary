@@ -10,6 +10,7 @@ export async function GET() {
   const session = await getActiveSession();
   if (!session) return NextResponse.json({ session: null });
   // Never expose PIN to the kiosk GET endpoint
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { pin: _pin, ...safe } = session;
   return NextResponse.json({ session: safe });
 }

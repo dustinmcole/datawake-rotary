@@ -24,6 +24,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json(updated);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { action: _action, publish: publishFlag, ...data } = body;
     // Handle publish boolean from edit modal
     if (typeof publishFlag === "boolean") {

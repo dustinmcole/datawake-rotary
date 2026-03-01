@@ -140,6 +140,7 @@ export default function CommitteeManagementPage() {
   const [selected, setSelected] = useState<Committee | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [committeeMembers, setCommitteeMembers] = useState<{ user: Member; membership: { role: string } }[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [addUserId, setAddUserId] = useState("");
 

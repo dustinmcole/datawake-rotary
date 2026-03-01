@@ -14,18 +14,13 @@ import {
   Tag,
   Trash2,
   X,
-  ChevronRight,
   Search,
-  Filter,
   Send,
-  MessageSquare,
   PhoneCall,
   Calendar,
   StickyNote,
   ArrowRight,
-  Building2,
   CheckCircle2,
-  Eye,
   UtensilsCrossed,
   Beer,
   Wine,
@@ -240,6 +235,7 @@ export default function VendorsPage() {
       }
     }
     loadVendors();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Force grid view on mobile

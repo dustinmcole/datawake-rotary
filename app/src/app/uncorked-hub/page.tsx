@@ -10,7 +10,6 @@ import {
   Store,
   ArrowRight,
   TrendingUp,
-  Calendar,
   Target,
 } from "lucide-react";
 import Link from "next/link";
@@ -218,7 +217,13 @@ export default function Dashboard() {
 }
 
 function QuickStatCard({
-  href, icon: Icon, label, value, subtitle, color,
+  href,
+  icon: Icon,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  label,
+  value,
+  subtitle,
+  color,
 }: {
   href: string;
   icon: React.ComponentType<{ className?: string }>;

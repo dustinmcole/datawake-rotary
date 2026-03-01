@@ -15,7 +15,6 @@ import {
   Trash2,
   X,
   Search,
-  Filter,
   Send,
   PhoneCall,
   Calendar,
@@ -23,9 +22,7 @@ import {
   ArrowRight,
   Building2,
   CheckCircle2,
-  ChevronDown,
   Users,
-  TrendingUp,
   Award,
   Target,
   Loader2,
@@ -178,6 +175,7 @@ export default function SponsorsPage() {
       }
     }
     loadSponsors();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Toast handler

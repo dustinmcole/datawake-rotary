@@ -1,6 +1,7 @@
 export async function getMessageTemplates() {
   return [];
 }
-export async function createMessage(data: Record<string, unknown>) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function createMessage(_data: Record<string, unknown>) {
   return { id: 1 };
 }

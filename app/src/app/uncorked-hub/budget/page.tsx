@@ -144,12 +144,6 @@ export default function BudgetPage() {
     }).filter((d) => d.value > 0);
   }, [items]);
 
-  // ---------- Filtered items ----------
-  const filteredItems = useMemo(
-    () => (filter === "all" ? items : items.filter((i) => i.type === filter)),
-    [items, filter]
-  );
-
   const incomeItems = useMemo(
     () => items.filter((i) => i.type === "income"),
     [items]

@@ -14,6 +14,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ session: null, checkins: [], count: 0 });
 
   const checkins = await getCheckinsByDate(session.meetingDate);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { pin: _pin, ...safeSession } = session;
   return NextResponse.json({ session: safeSession, checkins, count: checkins.length });
 }

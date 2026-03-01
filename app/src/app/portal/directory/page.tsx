@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Avatar from "@radix-ui/react-avatar";
 import { Search, X, Users, Phone, Mail, Building2, MapPin, Filter } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 type Member = {
   id: string;

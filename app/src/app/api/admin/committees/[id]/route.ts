@@ -50,6 +50,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ success: true });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { action: _action, ...data } = body;
     const updated = await updateCommittee(id, data);
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });

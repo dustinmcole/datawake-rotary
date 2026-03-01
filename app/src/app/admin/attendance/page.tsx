@@ -34,7 +34,9 @@ export default function AttendanceReportsPage() {
   const [loadingMembers, setLoadingMembers] = useState(true);
 
   // For report tab
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [reportData, setReportData] = useState<{ userId: string; date: string }[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingReport, setLoadingReport] = useState(false);
 
   const loadMembers = useCallback(() => {

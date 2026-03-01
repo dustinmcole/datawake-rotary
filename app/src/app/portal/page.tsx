@@ -250,6 +250,7 @@ function StatCard({
   value,
   sub,
   colorClass,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   bgClass,
 }: {
   label: string;

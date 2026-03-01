@@ -59,6 +59,7 @@ function VendorCard({ vendor }: { vendor: Contact }) {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           {vendor.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={vendor.logoUrl}
               alt={`${vendor.name} logo`}

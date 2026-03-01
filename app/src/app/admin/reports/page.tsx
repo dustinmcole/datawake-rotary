@@ -9,7 +9,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
   LineChart, Line,
 } from "recharts";
@@ -33,6 +33,7 @@ const ATTENDANCE_TREND = [
   { month: "Feb", rate: 0 },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EVENT_CATEGORIES = [
   { name: "Meeting", value: 0 },
   { name: "Service", value: 0 },

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { CalendarDays, MapPin, Clock, Loader2, CheckCircle2, Send, ExternalLink, Users, Plus } from "lucide-react";
-import { cn, formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 type ClubEvent = {
   id: string;
