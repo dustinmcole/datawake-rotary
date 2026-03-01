@@ -299,6 +299,33 @@ _(none currently)_
 - **Files:** src/app/board/layout.tsx, multiple page.tsx files, src/lib/db/schema.ts (new tables), API routes
 - **Acceptance:** Board members can view meetings, resolutions, documents. Protected by board_member+ role.
 
+### Priority 4.5: Data Integrity & Polish Sprint — P1, S
+- **Task:** Fix accumulated tech debt before building new features
+- **Scope:**
+  1. Auto-generate event slugs on creation (slugify title + date suffix for uniqueness) — events created via portal likely have null slugs breaking `/events/[slug]`
+  2. Add try-catch error boundaries to all Bryn tool executors in `src/lib/bryn/tool-executors.ts` — tool failures may hang the chat stream
+  3. Migrate Uncorked committee data from hardcoded `types.ts` to `users` table query (existing TODO in BUILD-COORD)
+  4. Mobile responsive audit: portal sidebar, admin sidebar, key portal pages (directory, attendance, events)
+- **Assignee:** Rex
+- **Status:** Not started
+- **Acceptance:** Event slugs auto-generated, Bryn tool errors gracefully handled, Uncorked committee reads from DB, portal usable on mobile (375px+)
+
+### Priority 5.5: Attendance Reminder Automation — P2, S
+- **Task:** Friday 10 AM cron job sends weekly meeting reminder to all active members
+- **Scope:** Query next meetings meeting, send reminder via email (Resend). Include: date/time, location, guest speaker if any, RSVP link. Depends on P5 (email system).
+- **Assignee:** Rex
+- **Status:** Not started — blocked on P5
+- **Files:** src/app/api/cron/attendance-reminder/route.ts, vercel.json cron config
+- **Acceptance:** Active members receive Friday reminder email. Opt-out respected via email preferences.
+
+### Priority 8: Public Event Detail Pages with SEO — P2, M
+- **Task:** Enhance `/events/[slug]` with SEO and engagement features
+- **Scope:** Open Graph meta tags, JSON-LD Event structured data, social sharing buttons, "Add to Calendar" (Google Calendar URL + .ics download), photo gallery placeholder (ties into P7)
+- **Assignee:** Rex
+- **Status:** Not started
+- **Files:** src/app/(rotary)/events/[slug]/page.tsx (enhance existing)
+- **Acceptance:** Event pages have proper OG tags, show in Google rich results, calendar download works.
+
 ### Priority 5: Email Notification System — P1, M
 - **Task:** Build transactional email service for platform events
 - **Scope:** Welcome emails for new members, event RSVP confirmations, attendance reminders (Friday before weekly lunch), announcement digests (weekly opt-in), membership inquiry auto-reply. Use Resend or Nodemailer with a verified domain.
