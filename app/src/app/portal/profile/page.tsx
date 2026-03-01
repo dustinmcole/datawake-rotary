@@ -89,7 +89,9 @@ export default function ProfilePage() {
     ? (() => {
         try {
           return JSON.parse(profile.roles);
-        } catch {
+        } catch (error) {
+          console.error('Operation failed:', error);
+          alert('Something went wrong. Please try again.');
           return ["member"];
         }
       })()

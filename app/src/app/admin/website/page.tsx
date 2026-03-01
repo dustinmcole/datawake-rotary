@@ -168,7 +168,9 @@ export default function WebsiteCmsPage() {
       } else {
         setSaveStatus("error");
       }
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setSaveStatus("error");
     } finally {
       setSaving(false);

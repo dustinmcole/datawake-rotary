@@ -45,7 +45,8 @@ export default async function EventsPage() {
   let events: Awaited<ReturnType<typeof getApprovedPublicEvents>> = [];
   try {
     events = await getApprovedPublicEvents();
-  } catch {
+  } catch (error) {
+    console.error('Request failed:', error);
     events = [];
   }
 

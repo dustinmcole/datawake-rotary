@@ -28,7 +28,9 @@ export async function GET() {
       const count = (result.rows?.[0] as { count: number })?.count ?? 0;
       stats[table] = count;
       totalRows += count;
-    } catch {
+    } catch (error) {
+      console.error('API error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       stats[table] = -1;
     }
   }

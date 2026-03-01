@@ -34,7 +34,8 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   let dbUser: DbUser | null = null;
   try {
     dbUser = await getUserByClerkId(user.id);
-  } catch {
+  } catch (error) {
+    console.error('Library error:', error);
     // DB may not be configured yet
   }
 
@@ -55,7 +56,8 @@ async function getRolesForUser(userId: string): Promise<Role[]> {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     return (user.publicMetadata?.roles as Role[]) ?? ["member"];
-  } catch {
+  } catch (error) {
+    console.error('Library error:', error);
     return [];
   }
 }

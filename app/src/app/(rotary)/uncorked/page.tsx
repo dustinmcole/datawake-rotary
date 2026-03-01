@@ -49,7 +49,8 @@ export default async function UncorkedLandingPage() {
   let sponsors: Contact[] = [];
   try {
     sponsors = await getPublicContacts(["sponsor", "potential_sponsor"]);
-  } catch {
+  } catch (error) {
+    console.error('Request failed:', error);
     // DB not configured — render static fallback
   }
 

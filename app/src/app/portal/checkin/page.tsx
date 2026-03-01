@@ -115,13 +115,17 @@ export default function CheckinMonitorPage() {
             const sData = await sRes.json();
             if (sData.session?.pin) setSessionPin(sData.session.pin);
           }
-        } catch {
+        } catch (error) {
+          console.error('Request failed:', error);
+          alert('Something went wrong. Please try again.');
           // ignore
         }
       } else {
         setSessionPin(null);
       }
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore network errors
     }
   }, []);
@@ -154,7 +158,9 @@ export default function CheckinMonitorPage() {
         } else {
           setManualMembers([]);
         }
-      } catch {
+      } catch (error) {
+        console.error('Request failed:', error);
+        alert('Something went wrong. Please try again.');
         setManualMembers([]);
       } finally {
         setManualSearching(false);
@@ -176,7 +182,9 @@ export default function CheckinMonitorPage() {
         setTimeout(() => setManualSuccess(null), 3000);
         poll();
       }
-    } catch {
+    } catch (error) {
+      console.error('Operation failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     }
   };

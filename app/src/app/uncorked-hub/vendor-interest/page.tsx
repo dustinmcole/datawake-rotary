@@ -61,7 +61,9 @@ export default function VendorInterestPage() {
         const data = await res.json();
         if (Array.isArray(data)) setSubmissions(data);
       }
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     } finally {
       setLoading(false);

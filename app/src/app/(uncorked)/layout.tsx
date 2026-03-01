@@ -18,7 +18,8 @@ export default async function PublicLayout({
   try {
     const config = await getEventConfig();
     ticketUrl = config.ticketUrlGeneral || undefined;
-  } catch {
+  } catch (error) {
+    console.error('Request failed:', error);
     // DB not yet configured — render without ticket link
   }
 

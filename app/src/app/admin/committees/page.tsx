@@ -193,7 +193,9 @@ export default function CommitteeManagementPage() {
       setAddUserId("");
       const data = await fetch(`/api/admin/committees/${selected.id}?members=true`).then((r) => r.json());
       setCommitteeMembers(data.members ?? []);
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // silently fail — UI remains in sync since we don't optimistically update
     }
   }
@@ -209,7 +211,9 @@ export default function CommitteeManagementPage() {
       if (res.ok) {
         setCommitteeMembers((prev) => prev.filter((m) => m.user.id !== userId));
       }
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // silently fail — re-fetch to stay in sync
       const data = await fetch(`/api/admin/committees/${selected.id}?members=true`).then((r) => r.json());
       setCommitteeMembers(data.members ?? []);
@@ -226,7 +230,9 @@ export default function CommitteeManagementPage() {
       });
       if (selected?.id === id) { setSelected(null); setCommitteeMembers([]); }
       load();
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // silently fail
     }
   }

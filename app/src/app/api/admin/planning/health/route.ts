@@ -31,7 +31,9 @@ export async function GET() {
     await db.execute(sql`SELECT 1`);
     dbLatency = Date.now() - start;
     dbConnected = true;
-  } catch {
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     dbConnected = false;
   }
 

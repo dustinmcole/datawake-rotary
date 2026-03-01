@@ -126,7 +126,8 @@ export default async function VendorsPage() {
   let vendors: Contact[] = [];
   try {
     vendors = await getPublicContacts(["vendor", "potential_vendor"]);
-  } catch {
+  } catch (error) {
+    console.error('Request failed:', error);
     // DB not configured — render empty state
   }
 

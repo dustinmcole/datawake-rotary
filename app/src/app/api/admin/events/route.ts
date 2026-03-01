@@ -15,7 +15,9 @@ export async function GET() {
   try {
     const evts = await getAllClubEvents();
     return NextResponse.json(evts);
-  } catch {
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     return NextResponse.json([]);
   }
 }

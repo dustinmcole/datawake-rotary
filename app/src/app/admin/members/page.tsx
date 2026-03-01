@@ -58,7 +58,7 @@ const ROLE_LABELS: Record<Role, string> = {
 const MEMBER_TYPES: MemberType[] = ["active", "honorary", "alumni", "leave", "prospect"];
 
 function parseRoles(rolesJson: string): Role[] {
-  try { return JSON.parse(rolesJson); } catch { return ["member"]; }
+  try { return JSON.parse(rolesJson); } catch (_) { return ["member"]; }
 }
 
 function RoleBadge({ role }: { role: Role }) {
@@ -416,7 +416,9 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       });
       const data = await res.json();
       setPreview(data.rows ?? []);
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setError("Failed to parse CSV");
     } finally {
       setPreviewing(false);
@@ -434,7 +436,9 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       const data = await res.json();
       setResult(data);
       onImported();
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setError("Import failed");
     } finally {
       setImporting(false);

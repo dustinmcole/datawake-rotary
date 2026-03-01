@@ -105,7 +105,9 @@ export default function BrynChatPage() {
         // For simplicity, we start fresh when selecting a thread
       }
       setShowSidebar(false);
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     }
   };

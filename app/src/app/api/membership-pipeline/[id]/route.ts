@@ -35,7 +35,9 @@ export async function GET(
       );
 
     return NextResponse.json(prospect);
-  } catch {
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     return NextResponse.json(
       { error: "Failed to fetch prospect" },
       { status: 500 }
@@ -107,7 +109,9 @@ export async function DELETE(
     const { id } = await params;
     await deleteProspect(id);
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     return NextResponse.json(
       { error: "Failed to delete prospect" },
       { status: 500 }

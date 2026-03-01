@@ -70,7 +70,9 @@ export default function MembershipPipelinePage() {
         : "/api/membership-pipeline";
       const res = await fetch(url);
       if (res.ok) setProspects(await res.json());
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     } finally {
       setLoading(false);
@@ -94,7 +96,9 @@ export default function MembershipPipelinePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stage: newStage }),
       });
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       fetchProspects(); // revert
     }
   };
@@ -426,7 +430,9 @@ function AddProspectModal({
         }),
       });
       if (res.ok) onCreated();
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     } finally {
       setSaving(false);

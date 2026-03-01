@@ -14,7 +14,9 @@ export async function GET() {
   try {
     const items = await getAllCommittees();
     return NextResponse.json(items);
-  } catch {
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     return NextResponse.json([]);
   }
 }
