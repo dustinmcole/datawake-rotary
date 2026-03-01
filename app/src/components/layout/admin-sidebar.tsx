@@ -18,12 +18,14 @@ import {
   Menu,
   X,
   ShieldCheck,
+  UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin", label: "Admin Dashboard", icon: LayoutDashboard },
   { href: "/admin/members", label: "Members", icon: Users },
+  { href: "/admin/membership-pipeline", label: "Membership Pipeline", icon: UserPlus },
   { href: "/admin/attendance", label: "Attendance", icon: CheckCircle },
   { href: "/admin/committees", label: "Committees", icon: Building2 },
   { href: "/admin/events", label: "Events", icon: CalendarDays },
