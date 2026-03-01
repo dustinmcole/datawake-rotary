@@ -58,7 +58,7 @@ const ROLE_LABELS: Record<Role, string> = {
 const MEMBER_TYPES: MemberType[] = ["active", "honorary", "alumni", "leave", "prospect"];
 
 function parseRoles(rolesJson: string): Role[] {
-  try { return JSON.parse(rolesJson); } catch (_) { return ["member"]; }
+  try { return JSON.parse(rolesJson); } catch { return ["member"]; }
 }
 
 function RoleBadge({ role }: { role: Role }) {
