@@ -228,6 +228,9 @@ export const eventRsvps = pgTable(
     eventId: varchar("event_id", { length: 128 }).notNull().references(() => events.id, { onDelete: "cascade" }),
     userId: varchar("user_id", { length: 128 }).notNull().references(() => users.id, { onDelete: "cascade" }),
     status: varchar("status", { length: 32 }).notNull().default("attending"), // attending, maybe, declined
+    mealChoice: varchar("meal_choice", { length: 64 }),
+    guestCount: integer("guest_count").notNull().default(0),
+    guestNames: varchar("guest_names", { length: 512 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (t) => [unique().on(t.eventId, t.userId)]
