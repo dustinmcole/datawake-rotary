@@ -657,7 +657,9 @@ export default function VendorsPage() {
         });
         if (!res.ok) return null;
         return await res.json() as Contact;
-      } catch {
+      } catch (error) {
+        console.error('Request failed:', error);
+        alert('Something went wrong. Please try again.');
         return null;
       }
     });

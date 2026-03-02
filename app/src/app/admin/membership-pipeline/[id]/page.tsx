@@ -123,7 +123,9 @@ export default function ProspectDetailPage({
         ).then((r) => r.json());
         setActivities(acts);
       }
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     } finally {
       setSaving(false);
@@ -137,7 +139,9 @@ export default function ProspectDetailPage({
         method: "DELETE",
       });
       if (res.ok) window.location.href = "/admin/membership-pipeline";
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     }
   };
@@ -607,7 +611,9 @@ function AddActivityModal({
         }
       );
       if (res.ok) onCreated();
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       // ignore
     } finally {
       setSaving(false);

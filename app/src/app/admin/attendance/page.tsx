@@ -77,7 +77,9 @@ export default function AttendanceReportsPage() {
       if (!res.ok) throw new Error();
       setSaveResult("success");
       setTimeout(() => setSaveResult(null), 3000);
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setSaveResult("error");
     } finally {
       setSaving(false);

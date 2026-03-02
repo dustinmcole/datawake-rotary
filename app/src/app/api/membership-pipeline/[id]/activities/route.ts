@@ -27,7 +27,9 @@ export async function GET(
     const { id } = await params;
     const activities = await getActivitiesForProspect(id);
     return NextResponse.json(activities);
-  } catch {
+  } catch (error) {
+    console.error('API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     return NextResponse.json([], { status: 200 });
   }
 }

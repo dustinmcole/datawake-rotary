@@ -10,7 +10,8 @@ import type { Contact, Activity } from "@/lib/types";
 function parseJson<T>(val: string | null | undefined, fallback: T): T {
   try {
     return val ? JSON.parse(val) : fallback;
-  } catch {
+  } catch (error) {
+    console.error('Library error:', error);
     return fallback;
   }
 }

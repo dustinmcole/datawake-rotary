@@ -416,7 +416,9 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       });
       const data = await res.json();
       setPreview(data.rows ?? []);
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setError("Failed to parse CSV");
     } finally {
       setPreviewing(false);
@@ -434,7 +436,9 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       const data = await res.json();
       setResult(data);
       onImported();
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setError("Import failed");
     } finally {
       setImporting(false);

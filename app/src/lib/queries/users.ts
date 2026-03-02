@@ -50,7 +50,8 @@ export async function deleteUser(id: string): Promise<void> {
 export function parseUserRoles(user: User): Role[] {
   try {
     return JSON.parse(user.roles) as Role[];
-  } catch {
+  } catch (error) {
+    console.error('Library error:', error);
     return ["member"];
   }
 }

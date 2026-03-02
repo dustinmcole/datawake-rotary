@@ -69,7 +69,8 @@ export default async function HomePage() {
   try {
     const all = await getApprovedPublicEvents();
     events = all.slice(0, 2); // 2 special events + the static weekly card = 3 total
-  } catch {
+  } catch (error) {
+    console.error('Request failed:', error);
     events = [];
   }
 

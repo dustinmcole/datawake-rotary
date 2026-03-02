@@ -41,7 +41,9 @@ export default function CheckinPage() {
         setSessionActive(false);
         setSessionDate(null);
       }
-    } catch {
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('Something went wrong. Please try again.');
       setSessionActive(false);
     }
   }, []);
@@ -73,7 +75,9 @@ export default function CheckinPage() {
         const data = await res.json();
         setMembers(data.members ?? []);
         setNoResults((data.members ?? []).length === 0);
-      } catch {
+      } catch (error) {
+        console.error('Request failed:', error);
+        alert('Something went wrong. Please try again.');
         setMembers([]);
         setNoResults(false);
       } finally {
@@ -108,7 +112,9 @@ export default function CheckinPage() {
         setOverlay({ type: "success", name: member.firstName });
         setTimeout(reset, 2500);
       }
-    } catch {
+    } catch (error) {
+      console.error('Operation failed:', error);
+      alert('Something went wrong. Please try again.');
       setOverlay({ type: "none" });
     }
   };
