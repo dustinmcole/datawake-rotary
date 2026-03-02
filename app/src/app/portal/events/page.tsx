@@ -44,6 +44,12 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
 
+  // RSVP Form state
+  const [rsvpModalEventId, setRsvpModalEventId] = useState<string | null>(null);
+  const [mealChoice, setMealChoice] = useState("");
+  const [guestCount, setGuestCount] = useState(0);
+  const [guestNames, setGuestNames] = useState("");
+
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -91,21 +97,34 @@ export default function EventsPage() {
         setRsvpingId(null);
       }
     } else {
-      // RSVP
-      setRsvpingId(eventId);
-      try {
-        const res = await fetch(`/api/events-club/${eventId}/rsvp`, { method: "POST" });
-        if (res.ok) {
-          setRsvpedIds((prev) => new Set([...prev, eventId]));
-          setUpcomingEvents((prev) =>
-            prev.map((e) =>
-              e.id === eventId ? { ...e, rsvpCount: (e.rsvpCount ?? 0) + 1 } : e
-            )
-          );
-        }
-      } finally {
-        setRsvpingId(null);
+      // Open RSVP form
+      setRsvpModalEventId(eventId);
+    }
+  }
+
+  async function submitRsvp() {
+    if (!rsvpModalEventId) return;
+    setRsvpingId(rsvpModalEventId);
+    try {
+      const res = await fetch(`/api/events-club/${rsvpModalEventId}/rsvp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mealChoice, guestCount, guestNames })
+      });
+      if (res.ok) {
+        setRsvpedIds((prev) => new Set([...prev, rsvpModalEventId]));
+        setUpcomingEvents((prev) =>
+          prev.map((e) =>
+            e.id === rsvpModalEventId ? { ...e, rsvpCount: (e.rsvpCount ?? 0) + 1 } : e
+          )
+        );
       }
+    } finally {
+      setRsvpingId(null);
+      setRsvpModalEventId(null);
+      setMealChoice("");
+      setGuestCount(0);
+      setGuestNames("");
     }
   }
 
@@ -283,34 +302,103 @@ export default function EventsPage() {
                             )}
                           </div>
 
-                          <div className="flex gap-2 mt-4">
-                            <button
-                              onClick={() => handleRsvp(event.id)}
-                              disabled={rsvpingId === event.id}
-                              className={cn(
-                                "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors",
-                                isRsvped
-                                  ? "bg-green-50 text-green-700 border border-green-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
-                                  : "bg-blue-600 hover:bg-blue-700 text-white"
-                              )}
-                            >
-                              {rsvpingId === event.id ? (
-                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                              ) : isRsvped ? (
-                                <CheckCircle2 className="w-3.5 h-3.5" />
-                              ) : null}
-                              {isRsvped ? "RSVP'd · Cancel?" : "RSVP"}
-                            </button>
-                            {event.rsvpUrl && (
-                              <a
-                                href={event.rsvpUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                                External RSVP
-                              </a>
+                          <div className="flex flex-col gap-2 mt-4 w-full">
+                            {rsvpModalEventId === event.id ? (
+                              <div className="w-full bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+                                <h4 className="font-semibold text-sm text-gray-900">Complete RSVP</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <FormField label="Meal Choice">
+                                    <select
+                                      value={mealChoice}
+                                      onChange={(e) => setMealChoice(e.target.value)}
+                                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm bg-white"
+                                    >
+                                      <option value="">No meal / N/A</option>
+                                      <option value="chicken">Chicken</option>
+                                      <option value="beef">Beef</option>
+                                      <option value="fish">Fish</option>
+                                      <option value="vegetarian">Vegetarian</option>
+                                      <option value="vegan">Vegan</option>
+                                    </select>
+                                  </FormField>
+                                  <FormField label="Number of Guests">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={guestCount}
+                                      onChange={(e) => setGuestCount(parseInt(e.target.value) || 0)}
+                                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                                    />
+                                  </FormField>
+                                </div>
+                                {guestCount > 0 && (
+                                  <FormField label="Guest Names" hint="Comma separated">
+                                    <input
+                                      type="text"
+                                      value={guestNames}
+                                      onChange={(e) => setGuestNames(e.target.value)}
+                                      placeholder="Jane Doe, John Smith"
+                                      className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                                    />
+                                  </FormField>
+                                )}
+                                <div className="flex gap-2 pt-2">
+                                  <button
+                                    onClick={submitRsvp}
+                                    disabled={rsvpingId === event.id}
+                                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+                                  >
+                                    {rsvpingId === event.id ? (
+                                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                      <CheckCircle2 className="w-3.5 h-3.5" />
+                                    )}
+                                    Confirm RSVP
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setRsvpModalEventId(null);
+                                      setMealChoice("");
+                                      setGuestCount(0);
+                                      setGuestNames("");
+                                    }}
+                                    className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-200 transition-colors"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleRsvp(event.id)}
+                                  disabled={rsvpingId === event.id}
+                                  className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors",
+                                    isRsvped
+                                      ? "bg-green-50 text-green-700 border border-green-200 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
+                                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                                  )}
+                                >
+                                  {rsvpingId === event.id ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  ) : isRsvped ? (
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                  ) : null}
+                                  {isRsvped ? "RSVP'd · Cancel?" : "RSVP"}
+                                </button>
+                                {event.rsvpUrl && (
+                                  <a
+                                    href={event.rsvpUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors"
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                    External RSVP
+                                  </a>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>

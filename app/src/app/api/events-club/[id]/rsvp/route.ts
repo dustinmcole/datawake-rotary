@@ -19,11 +19,16 @@ export async function POST(
     const existing = await getRsvp(eventId, dbUser.id);
     if (existing) return NextResponse.json(existing);
 
+    const body = await _req.json().catch(() => ({}));
+
     const rsvp = await createRsvp({
       id: generateId(),
       eventId,
       userId: dbUser.id,
       status: "attending",
+      mealChoice: body.mealChoice || null,
+      guestCount: body.guestCount || 0,
+      guestNames: body.guestNames || null,
     });
     return NextResponse.json(rsvp, { status: 201 });
   } catch (err) {
