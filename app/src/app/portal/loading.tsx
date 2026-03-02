@@ -1,3 +1,6 @@
+
+import { PortalDashboardSkeleton } from "@/components/skeletons/PortalDashboardSkeleton";
+
 export default function Loading() {
-  return <div>Loading...</div>;
+  return <PortalDashboardSkeleton />;
 }
