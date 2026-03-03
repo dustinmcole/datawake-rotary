@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useEffect, useCallback, type DragEvent } from "react";
 import Link from "next/link";
 import {
@@ -72,7 +73,7 @@ export default function MembershipPipelinePage() {
       if (res.ok) setProspects(await res.json());
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     } finally {
       setLoading(false);
@@ -98,7 +99,7 @@ export default function MembershipPipelinePage() {
       });
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       fetchProspects(); // revert
     }
   };
@@ -432,7 +433,7 @@ function AddProspectModal({
       if (res.ok) onCreated();
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     } finally {
       setSaving(false);

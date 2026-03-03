@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useUser } from "@clerk/nextjs";
 
@@ -117,7 +118,7 @@ export default function CheckinMonitorPage() {
           }
         } catch (error) {
           console.error('Request failed:', error);
-          alert('Something went wrong. Please try again.');
+          toast.error('Something went wrong. Please try again.');
           // ignore
         }
       } else {
@@ -125,7 +126,7 @@ export default function CheckinMonitorPage() {
       }
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore network errors
     }
   }, []);
@@ -160,7 +161,7 @@ export default function CheckinMonitorPage() {
         }
       } catch (error) {
         console.error('Request failed:', error);
-        alert('Something went wrong. Please try again.');
+        toast.error('Something went wrong. Please try again.');
         setManualMembers([]);
       } finally {
         setManualSearching(false);
@@ -184,7 +185,7 @@ export default function CheckinMonitorPage() {
       }
     } catch (error) {
       console.error('Operation failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     }
   };
