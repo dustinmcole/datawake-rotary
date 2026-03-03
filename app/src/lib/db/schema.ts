@@ -392,3 +392,37 @@ export const checkinSessions = pgTable("checkin_sessions", {
   isActive: boolean("is_active").notNull().default(true),
   notes: varchar("notes", { length: 512 }).notNull().default(""),
 });
+
+// ============================================
+// community_contacts — partners, guests, speakers, referrals, donors
+// ============================================
+export const communityContacts = pgTable("community_contacts", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  firstName: varchar("first_name", { length: 128 }).notNull(),
+  lastName: varchar("last_name", { length: 128 }).notNull(),
+  email: varchar("email", { length: 256 }).notNull().default(""),
+  phone: varchar("phone", { length: 64 }).notNull().default(""),
+  company: varchar("company", { length: 256 }).notNull().default(""),
+  type: varchar("type", { length: 32 }).notNull(), // partner | guest | speaker | referral | donor
+  status: varchar("status", { length: 32 }).notNull().default("cold"), // cold | warm | active | inactive
+  notes: text("notes").notNull().default(""),
+  website: varchar("website", { length: 512 }).notNull().default(""),
+  address: varchar("address", { length: 512 }).notNull().default(""),
+  tags: text("tags").notNull().default("[]"),
+  assignedTo: varchar("assigned_to", { length: 128 }).notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// community_contact_activities — activity timeline
+// ============================================
+export const communityContactActivities = pgTable("community_contact_activities", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  contactId: varchar("contact_id", { length: 128 }).notNull().references(() => communityContacts.id, { onDelete: "cascade" }),
+  activityType: varchar("activity_type", { length: 32 }).notNull(), // note | call | email | meeting | event | other
+  description: text("description").notNull().default(""),
+  activityDate: timestamp("activity_date").notNull().defaultNow(),
+  loggedBy: varchar("logged_by", { length: 128 }).notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
