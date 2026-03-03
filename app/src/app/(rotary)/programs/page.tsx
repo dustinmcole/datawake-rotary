@@ -15,6 +15,19 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Programs & Service",
   description: "Explore Fullerton Rotary's community service, youth programs, international projects, vocational service, and The Rotary Foundation.",
+  openGraph: {
+    title: "Programs & Service | Fullerton Rotary Club",
+    description: "Explore Fullerton Rotary's community service, youth programs, international projects, vocational service, and The Rotary Foundation.",
+    url: "https://www.fullertonrotary.org/programs",
+    siteName: "Fullerton Rotary Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Programs & Service | Fullerton Rotary Club",
+    description: "Explore Fullerton Rotary's community service, youth programs, international projects, vocational service, and The Rotary Foundation.",
+  },
 };
 
 export default function ProgramsPage() {
