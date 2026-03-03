@@ -150,3 +150,23 @@ body {
   font-weight: 500;
   line-height: 20px;
 }
+
+/* ── Sonner Toast — Rotary Brand Styling ───────────────────────────── */
+/* Error toasts: Rotary navy left-border accent */
+[data-sonner-toaster] .rotary-toast-error {
+  border-left: 4px solid #003366 !important; /* --color-navy-700 */
+}
+
+/* Success toasts: Rotary gold left-border accent */
+[data-sonner-toaster] .rotary-toast-success {
+  border-left: 4px solid #f59e0b !important; /* --color-gold-500 */
+}
+
+/* Mobile (≤640px): shift toaster from bottom-right to bottom-center */
+@media (max-width: 640px) {
+  [data-sonner-toaster][data-x-position="right"] {
+    right: 50% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
