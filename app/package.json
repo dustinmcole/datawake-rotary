@@ -10,7 +10,9 @@
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/lib/db/seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test": "node node_modules/vitest/vitest.mjs",
+    "test:run": "node node_modules/vitest/vitest.mjs run"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.50",
@@ -47,15 +49,21 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.1.4",
     "dotenv": "^17.3.1",
     "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "jsdom": "^28.1.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^2.1.9"
   }
 }
