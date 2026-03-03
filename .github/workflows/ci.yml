@@ -31,3 +31,25 @@ jobs:
 
       - name: Type check
         run: npx tsc --noEmit
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies (including devDependencies)
+        run: npm install --include=dev
+
+      - name: Run tests
+        run: npm run test:run
