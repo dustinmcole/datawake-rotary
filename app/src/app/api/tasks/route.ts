@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllTasks, createTask } from "@/lib/queries/tasks";
 import { generateId } from "@/lib/utils";
+import { validate } from "@/lib/validations/api-validate";
+import { createTaskSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -15,10 +17,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const task = await createTask({
-      ...body,
-      id: body.id || generateId(),
-    });
+    const validated = validate(body, createTaskSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const task = await createTask({ ...data, id: generateId() });
     return NextResponse.json(task, { status: 201 });
   } catch (err) {
     console.error("POST /api/tasks error:", err);

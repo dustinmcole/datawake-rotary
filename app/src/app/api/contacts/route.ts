@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllContacts, getContactsByType, createContact } from "@/lib/queries/contacts";
 import { generateId } from "@/lib/utils";
+import { validate } from "@/lib/validations/api-validate";
+import { createContactSchema } from "@/lib/validations";
 
 export async function GET(req: NextRequest) {
   try {
     const type = req.nextUrl.searchParams.get("type");
     const publicOnly = req.nextUrl.searchParams.get("public") === "true";
-
     let contacts;
     if (type) {
       const types = type.split(",");
@@ -19,7 +20,6 @@ export async function GET(req: NextRequest) {
     } else {
       contacts = await getAllContacts();
     }
-
     return NextResponse.json(contacts);
   } catch (err) {
     console.error("GET /api/contacts error:", err);
@@ -30,14 +30,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const contact = await createContact({
-      ...body,
-      id: body.id || generateId(),
-      activities: body.activities || [],
-      tags: body.tags || [],
-      years: body.years || [],
-      publicVisible: body.publicVisible ?? false,
-    });
+    const validated = validate(body, createContactSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const contact = await createContact({ ...data, id: generateId() });
     return NextResponse.json(contact, { status: 201 });
   } catch (err) {
     console.error("POST /api/contacts error:", err);

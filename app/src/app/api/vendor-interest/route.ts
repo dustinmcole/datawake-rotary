@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllSubmissions, createSubmission } from "@/lib/queries/vendor-interest";
 import { generateId } from "@/lib/utils";
+import { validate } from "@/lib/validations/api-validate";
+import { createVendorInterestSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -15,23 +17,20 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-
-    if (!body.businessName) {
-      return NextResponse.json({ error: "Business name is required" }, { status: 400 });
-    }
-
+    const validated = validate(body, createVendorInterestSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
     const submission = await createSubmission({
       id: generateId(),
-      businessName: body.businessName,
-      contactName: body.contactName || "",
-      email: body.email || "",
-      phone: body.phone || "",
-      category: body.category || "",
-      website: body.website || "",
-      description: body.description || "",
-      previousParticipant: body.previousParticipant ?? false,
+      businessName: data.businessName,
+      contactName: data.contactName,
+      email: data.email,
+      phone: data.phone,
+      category: data.category,
+      website: data.website,
+      description: data.description,
+      previousParticipant: data.previousParticipant,
     });
-
     return NextResponse.json(submission, { status: 201 });
   } catch (err) {
     console.error("POST /api/vendor-interest error:", err);

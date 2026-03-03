@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllBudgetItems, createBudgetItem } from "@/lib/queries/budget";
 import { generateId } from "@/lib/utils";
+import { validate } from "@/lib/validations/api-validate";
+import { createBudgetItemSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -15,10 +17,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const item = await createBudgetItem({
-      ...body,
-      id: body.id || generateId(),
-    });
+    const validated = validate(body, createBudgetItemSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const item = await createBudgetItem({ ...data, id: generateId() });
     return NextResponse.json(item, { status: 201 });
   } catch (err) {
     console.error("POST /api/budget error:", err);

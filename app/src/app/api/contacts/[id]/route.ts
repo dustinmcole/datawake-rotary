@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getContactById, updateContact, deleteContact } from "@/lib/queries/contacts";
+import { validate } from "@/lib/validations/api-validate";
+import { updateContactSchema } from "@/lib/validations";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,7 +19,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await req.json();
-    const contact = await updateContact(id, body);
+    const validated = validate(body, updateContactSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const contact = await updateContact(id, data);
     if (!contact) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(contact);
   } catch (err) {

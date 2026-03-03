@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTaskById, updateTask, deleteTask } from "@/lib/queries/tasks";
+import { validate } from "@/lib/validations/api-validate";
+import { updateTaskSchema } from "@/lib/validations";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -17,7 +19,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await req.json();
-    const task = await updateTask(id, body);
+    const validated = validate(body, updateTaskSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const task = await updateTask(id, data);
     if (!task) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(task);
   } catch (err) {

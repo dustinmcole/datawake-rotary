@@ -392,3 +392,43 @@ export const checkinSessions = pgTable("checkin_sessions", {
   isActive: boolean("is_active").notNull().default(true),
   notes: varchar("notes", { length: 512 }).notNull().default(""),
 });
+
+// ============================================
+// cc_list_mappings — Constant Contact segment → list mapping
+// ============================================
+export const ccListMappings = pgTable("cc_list_mappings", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  segment: varchar("segment", { length: 64 }).notNull().unique(),
+  ccListId: varchar("cc_list_id", { length: 256 }).notNull().default(""),
+  ccListName: varchar("cc_list_name", { length: 256 }).notNull().default(""),
+  enabled: boolean("enabled").notNull().default(true),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// cc_sync_logs — Constant Contact sync history
+// ============================================
+export const ccSyncLogs = pgTable("cc_sync_logs", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  segment: varchar("segment", { length: 64 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull(),
+  recordsSynced: integer("records_synced").notNull().default(0),
+  recordsFailed: integer("records_failed").notNull().default(0),
+  errorMessage: text("error_message"),
+  triggeredBy: varchar("triggered_by", { length: 32 }).notNull().default("manual"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// ============================================
+// cc_config — single-row OAuth + schedule config
+// ============================================
+export const ccConfig = pgTable("cc_config", {
+  id: integer("id").primaryKey().default(1),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  tokenExpiresAt: timestamp("token_expires_at"),
+  connected: boolean("connected").notNull().default(false),
+  syncSchedule: varchar("sync_schedule", { length: 32 }).notNull().default("manual"),
+  fieldMappings: text("field_mappings").notNull().default("{}"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});

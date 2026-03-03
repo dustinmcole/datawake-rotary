@@ -7,14 +7,12 @@ import {
   getRsvpCountForEvent,
 } from "@/lib/queries/events-club";
 import { hasAnyRole } from "@/lib/auth";
+import { validate } from "@/lib/validations/api-validate";
+import { updateEventSchema } from "@/lib/validations";
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { id } = await params;
   try {
     const event = await getClubEventById(id);
@@ -27,20 +25,18 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const isAdmin = await hasAnyRole(userId, ["super_admin", "club_admin"]);
   if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
   const { id } = await params;
   try {
     const body = await req.json();
-    const updated = await updateClubEvent(id, { ...body, updatedAt: new Date() });
+    const validated = validate(body, updateEventSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const updated = await updateClubEvent(id, { ...data, updatedAt: new Date() });
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(updated);
   } catch (err) {
@@ -49,16 +45,11 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const isAdmin = await hasAnyRole(userId, ["super_admin", "club_admin"]);
   if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
   const { id } = await params;
   try {
     await deleteClubEvent(id);

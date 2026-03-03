@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSubmissionById, processSubmission } from "@/lib/queries/vendor-interest";
 import { createContact } from "@/lib/queries/contacts";
 import { generateId } from "@/lib/utils";
+import { validate } from "@/lib/validations/api-validate";
+import { processVendorInterestSchema } from "@/lib/validations";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,22 +17,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   }
 }
 
-// PUT converts submission into a contact lead
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const body = await req.json();
-
+    const validated = validate(body, processVendorInterestSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
     const submission = await getSubmissionById(id);
     if (!submission) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    if (submission.processed) {
-      return NextResponse.json({ error: "Already processed" }, { status: 400 });
-    }
-
+    if (submission.processed) return NextResponse.json({ error: "Already processed" }, { status: 400 });
     const currentYear = new Date().getFullYear();
     const contactId = generateId();
-
     await createContact({
       id: contactId,
       name: submission.contactName || submission.businessName,
@@ -50,7 +48,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           type: "note",
           description: `Converted from vendor interest form submission. Previous participant: ${submission.previousParticipant ? "Yes" : "No"}`,
           date: new Date().toISOString(),
-          createdBy: body.convertedBy || "Admin",
+          createdBy: data.convertedBy,
         },
       ],
       tags: ["vendor-interest-form"],
@@ -58,7 +56,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       assignedTo: "Unassigned",
       publicVisible: false,
     });
-
     const updated = await processSubmission(id, contactId);
     return NextResponse.json(updated);
   } catch (err) {

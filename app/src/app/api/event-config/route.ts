@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEventConfig, updateEventConfig } from "@/lib/queries/event-config";
+import { validate } from "@/lib/validations/api-validate";
+import { updateEventConfigSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -14,7 +16,10 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const config = await updateEventConfig(body);
+    const validated = validate(body, updateEventConfigSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const config = await updateEventConfig(data);
     return NextResponse.json(config);
   } catch (err) {
     console.error("PUT /api/event-config error:", err);

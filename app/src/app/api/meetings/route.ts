@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllMeetings, createMeeting } from "@/lib/queries/meetings";
 import { generateId } from "@/lib/utils";
+import { validate } from "@/lib/validations/api-validate";
+import { createMeetingSchema } from "@/lib/validations";
 
 export async function GET() {
   try {
@@ -15,12 +17,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const meeting = await createMeeting({
-      ...body,
-      id: body.id || generateId(),
-      attendees: body.attendees || [],
-      actionItems: body.actionItems || [],
-    });
+    const validated = validate(body, createMeetingSchema);
+    if (validated instanceof NextResponse) return validated;
+    const { data } = validated;
+    const meeting = await createMeeting({ ...data, id: generateId() });
     return NextResponse.json(meeting, { status: 201 });
   } catch (err) {
     console.error("POST /api/meetings error:", err);

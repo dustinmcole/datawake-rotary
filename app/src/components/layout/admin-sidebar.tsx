@@ -32,6 +32,7 @@ const navItems = [
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/website", label: "Website (CMS)", icon: Globe },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+  { href: "/admin/integrations", label: "Integrations", icon: Settings },
   { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/uncorked-hub", label: "Planning Hub", icon: Compass },
 ];

@@ -7,15 +7,12 @@ import { inviteMemberSchema } from "@/lib/validations";
 export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const isAdmin = await hasAnyRole(userId, ["super_admin", "club_admin"]);
   if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
   const body = await req.json();
   const validated = validate(body, inviteMemberSchema);
   if (validated instanceof NextResponse) return validated;
   const { data } = validated;
-
   try {
     const clerk = await clerkClient();
     const invitation = await clerk.invitations.createInvitation({
@@ -27,7 +24,6 @@ export async function POST(req: Request) {
       },
       redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/register`,
     });
-
     return NextResponse.json({ success: true, invitationId: invitation.id });
   } catch (err: unknown) {
     console.error("Invite member error:", err);
