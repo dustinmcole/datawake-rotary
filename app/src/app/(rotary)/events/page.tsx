@@ -9,9 +9,24 @@ import {
   Users,
 } from "lucide-react";
 
-export const metadata = {
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
   title: "Events",
   description: "Upcoming events, service projects, socials, and meetings from the Rotary Club of Fullerton.",
+  openGraph: {
+    title: "Events | Fullerton Rotary Club",
+    description: "Upcoming events, service projects, socials, and meetings from the Rotary Club of Fullerton.",
+    url: "https://www.fullertonrotary.org/events",
+    siteName: "Fullerton Rotary Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Events | Fullerton Rotary Club",
+    description: "Upcoming events, service projects, socials, and meetings from the Rotary Club of Fullerton.",
+  },
 };
 
 const categoryColors: Record<string, string> = {

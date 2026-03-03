@@ -22,6 +22,21 @@ export const metadata: Metadata = {
   title: "Fullerton Uncorked",
   description:
     "Fullerton Uncorked is the Rotary Club of Fullerton's annual wine, beer & food tasting fundraiser. October 17, 2026 at the Fullerton Family YMCA.",
+  openGraph: {
+    title: "Fullerton Uncorked | Fullerton Rotary Club",
+    description:
+      "Fullerton Uncorked is the Rotary Club of Fullerton's annual wine, beer & food tasting fundraiser. October 17, 2026 at the Fullerton Family YMCA.",
+    url: "https://www.fullertonrotary.org/uncorked",
+    siteName: "Fullerton Rotary Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fullerton Uncorked | Fullerton Rotary Club",
+    description:
+      "Fullerton Uncorked is the Rotary Club of Fullerton's annual wine, beer & food tasting fundraiser. October 17, 2026 at the Fullerton Family YMCA.",
+  },
 };
 
 /* ============================================ */

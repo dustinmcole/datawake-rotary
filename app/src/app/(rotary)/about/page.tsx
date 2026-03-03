@@ -1,9 +1,24 @@
 import { Shield, Clock, MapPin, Globe, Users, Handshake, Star } from "lucide-react";
 import Link from "next/link";
 
-export const metadata = {
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
   title: "About Us",
   description: "Learn about the Rotary Club of Fullerton — serving the community since 1924. Our history, the Four-Way Test, mission, and meeting information.",
+  openGraph: {
+    title: "About Us | Fullerton Rotary Club",
+    description: "Learn about the Rotary Club of Fullerton — serving the community since 1924. Our history, the Four-Way Test, mission, and meeting information.",
+    url: "https://www.fullertonrotary.org/about",
+    siteName: "Fullerton Rotary Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Us | Fullerton Rotary Club",
+    description: "Learn about the Rotary Club of Fullerton — serving the community since 1924. Our history, the Four-Way Test, mission, and meeting information.",
+  },
 };
 
 export default function AboutPage() {
