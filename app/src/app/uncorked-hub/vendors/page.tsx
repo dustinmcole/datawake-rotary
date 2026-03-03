@@ -1,6 +1,6 @@
 "use client";
 
-import { toast } from "sonner";
+import { toast as sonnerToast } from "sonner";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   Store,
@@ -210,7 +210,7 @@ export default function VendorsPage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailSubject, setEmailSubject] = useState("");
   const [emailBody, setEmailBody] = useState("");
-  const [toast, setToast] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [draggedVendorId, setDraggedVendorId] = useState<string | null>(null);
   const [newActivityType, setNewActivityType] = useState<ActivityType>("note");
   const [newActivityDesc, setNewActivityDesc] = useState("");
@@ -252,8 +252,8 @@ export default function VendorsPage() {
 
   // Toast handler
   const showToast = useCallback((message: string) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 3000);
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(null), 3000);
   }, []);
 
   // Filtered vendors
@@ -660,7 +660,7 @@ export default function VendorsPage() {
         return await res.json() as Contact;
       } catch (error) {
         console.error('Request failed:', error);
-        toast.error('Something went wrong. Please try again.');
+        sonnerToast.error('Something went wrong. Please try again.');
         return null;
       }
     });
@@ -709,11 +709,11 @@ export default function VendorsPage() {
   return (
     <div className="animate-fade-in">
       {/* Toast */}
-      {toast && (
+      {toastMessage && (
         <div className="fixed top-6 right-6 z-[100] animate-fade-in">
           <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-wine-900 text-white shadow-lg text-sm font-medium">
             <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-            {toast}
+            {toastMessage}
           </div>
         </div>
       )}

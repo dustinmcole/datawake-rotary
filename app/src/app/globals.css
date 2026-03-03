@@ -150,3 +150,22 @@ body {
   font-weight: 500;
   line-height: 20px;
 }
+
+/* Rotary brand toast styles */
+.rotary-toast {
+  border-radius: 8px !important;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+.rotary-toast-success {
+  background: #003F8A !important;
+  color: #ffffff !important;
+  border-color: #003F8A !important;
+}
+.rotary-toast-error {
+  border-color: #c0392b !important;
+}
+.rotary-toast-warning {
+  background: #F5A623 !important;
+  color: #1a1a1a !important;
+  border-color: #F5A623 !important;
+}

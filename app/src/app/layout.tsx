@@ -29,7 +29,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           {children}
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="bottom-right" duration={5000} toastOptions={{ classNames: { toast: "rotary-toast", error: "rotary-toast-error", success: "rotary-toast-success", warning: "rotary-toast-warning" } }} />
         </body>
       </html>
     </ClerkProvider>
