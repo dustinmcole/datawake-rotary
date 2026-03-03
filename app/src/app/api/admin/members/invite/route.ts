@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { hasAnyRole } from "@/lib/auth";
+import { validate } from "@/lib/validations/api-validate";
+import { inviteMemberSchema } from "@/lib/validations";
 
 export async function POST(req: Request) {
   const { userId } = await auth();
@@ -10,18 +12,18 @@ export async function POST(req: Request) {
   if (!isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
-  const { email, firstName, lastName, roles } = body;
-
-  if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
+  const validated = validate(body, inviteMemberSchema);
+  if (validated instanceof NextResponse) return validated;
+  const { data } = validated;
 
   try {
     const clerk = await clerkClient();
     const invitation = await clerk.invitations.createInvitation({
-      emailAddress: email,
+      emailAddress: data.email,
       publicMetadata: {
-        roles: roles ?? ["member"],
-        firstName: firstName ?? "",
-        lastName: lastName ?? "",
+        roles: data.roles,
+        firstName: data.firstName,
+        lastName: data.lastName,
       },
       redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/register`,
     });

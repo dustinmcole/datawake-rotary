@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { hasRole } from "@/lib/auth";
 import { db } from "@/lib/db/client";
 import { sql } from "drizzle-orm";
+import { env } from "@/lib/env";
 
 export async function GET() {
   const { userId } = await auth();
@@ -12,15 +13,16 @@ export async function GET() {
   if (!isSuperAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   // Check env vars (boolean only, never expose values)
+  // These are already validated at startup by env.ts — if we reach here they're set.
   const envVars: Record<string, boolean> = {
-    DATABASE_URL: !!process.env.DATABASE_URL,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    CLERK_SECRET_KEY: !!process.env.CLERK_SECRET_KEY,
-    ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL: !!process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
-    NEXT_PUBLIC_CLERK_SIGN_UP_URL: !!process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: !!process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
-    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: !!process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
+    DATABASE_URL: !!env.DATABASE_URL,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: !!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    CLERK_SECRET_KEY: !!env.CLERK_SECRET_KEY,
+    ANTHROPIC_API_KEY: !!env.ANTHROPIC_API_KEY,
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: !!env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: !!env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: !!env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: !!env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
   };
 
   // Check DB connectivity
@@ -32,8 +34,7 @@ export async function GET() {
     dbLatency = Date.now() - start;
     dbConnected = true;
   } catch (error) {
-    console.error('API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("DB health check error:", error);
     dbConnected = false;
   }
 
@@ -53,7 +54,7 @@ export async function GET() {
       label: "Anthropic AI",
     },
     vercel: {
-      configured: !!process.env.VERCEL,
+      configured: !!env.VERCEL,
       label: "Vercel Deployment",
     },
   };
