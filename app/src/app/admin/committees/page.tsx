@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useEffect, useState, useCallback } from "react";
 import {
   Building2,
@@ -195,7 +196,7 @@ export default function CommitteeManagementPage() {
       setCommitteeMembers(data.members ?? []);
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // silently fail — UI remains in sync since we don't optimistically update
     }
   }
@@ -213,7 +214,7 @@ export default function CommitteeManagementPage() {
       }
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // silently fail — re-fetch to stay in sync
       const data = await fetch(`/api/admin/committees/${selected.id}?members=true`).then((r) => r.json());
       setCommitteeMembers(data.members ?? []);
@@ -232,7 +233,7 @@ export default function CommitteeManagementPage() {
       load();
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // silently fail
     }
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   Store,
@@ -659,7 +660,7 @@ export default function VendorsPage() {
         return await res.json() as Contact;
       } catch (error) {
         console.error('Request failed:', error);
-        alert('Something went wrong. Please try again.');
+        toast.error('Something went wrong. Please try again.');
         return null;
       }
     });
