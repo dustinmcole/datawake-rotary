@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useEffect, useState, useCallback } from "react";
 import {
   ClipboardList,
@@ -79,7 +80,7 @@ export default function AttendanceReportsPage() {
       setTimeout(() => setSaveResult(null), 3000);
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       setSaveResult("error");
     } finally {
       setSaving(false);

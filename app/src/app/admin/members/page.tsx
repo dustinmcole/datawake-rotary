@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Users,
@@ -418,7 +419,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       setPreview(data.rows ?? []);
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       setError("Failed to parse CSV");
     } finally {
       setPreviewing(false);
@@ -438,7 +439,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       onImported();
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       setError("Import failed");
     } finally {
       setImporting(false);

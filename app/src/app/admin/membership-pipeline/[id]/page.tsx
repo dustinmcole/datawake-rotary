@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import {
@@ -125,7 +126,7 @@ export default function ProspectDetailPage({
       }
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     } finally {
       setSaving(false);
@@ -141,7 +142,7 @@ export default function ProspectDetailPage({
       if (res.ok) window.location.href = "/admin/membership-pipeline";
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     }
   };
@@ -613,7 +614,7 @@ function AddActivityModal({
       if (res.ok) onCreated();
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     } finally {
       setSaving(false);

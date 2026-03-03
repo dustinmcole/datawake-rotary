@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import {
@@ -170,7 +171,7 @@ export default function WebsiteCmsPage() {
       }
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       setSaveStatus("error");
     } finally {
       setSaving(false);
