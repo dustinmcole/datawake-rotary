@@ -8,9 +8,24 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-export const metadata = {
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
   title: "Contact Us",
   description: "Get in touch with the Rotary Club of Fullerton. Meeting location, times, and how to reach us.",
+  openGraph: {
+    title: "Contact Us | Fullerton Rotary Club",
+    description: "Get in touch with the Rotary Club of Fullerton. Meeting location, times, and how to reach us.",
+    url: "https://www.fullertonrotary.org/contact",
+    siteName: "Fullerton Rotary Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Us | Fullerton Rotary Club",
+    description: "Get in touch with the Rotary Club of Fullerton. Meeting location, times, and how to reach us.",
+  },
 };
 
 const CONTACT_CARDS = [
