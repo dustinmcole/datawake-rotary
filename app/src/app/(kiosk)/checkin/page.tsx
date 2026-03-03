@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { toast } from "sonner";
 
 interface Member {
   id: string;
@@ -43,7 +44,7 @@ export default function CheckinPage() {
       }
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       setSessionActive(false);
     }
   }, []);
@@ -77,7 +78,7 @@ export default function CheckinPage() {
         setNoResults((data.members ?? []).length === 0);
       } catch (error) {
         console.error('Request failed:', error);
-        alert('Something went wrong. Please try again.');
+        toast.error('Something went wrong. Please try again.');
         setMembers([]);
         setNoResults(false);
       } finally {
@@ -114,7 +115,7 @@ export default function CheckinPage() {
       }
     } catch (error) {
       console.error('Operation failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       setOverlay({ type: "none" });
     }
   };

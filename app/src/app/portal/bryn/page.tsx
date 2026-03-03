@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import {
@@ -107,7 +108,7 @@ export default function BrynChatPage() {
       setShowSidebar(false);
     } catch (error) {
       console.error('Request failed:', error);
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
       // ignore
     }
   };

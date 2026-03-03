@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import * as Avatar from "@radix-ui/react-avatar";
 import { UserCircle, Save, Loader2, CheckCircle2, Camera } from "lucide-react";
@@ -91,7 +92,7 @@ export default function ProfilePage() {
           return JSON.parse(profile.roles);
         } catch (error) {
           console.error('Operation failed:', error);
-          alert('Something went wrong. Please try again.');
+          toast.error('Something went wrong. Please try again.');
           return ["member"];
         }
       })()
