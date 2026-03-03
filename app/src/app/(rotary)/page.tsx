@@ -62,6 +62,21 @@ export const metadata: Metadata = {
   title: "Fullerton Rotary Club — Service Above Self",
   description:
     "The Rotary Club of Fullerton has been serving the community since 1924. Join us every Wednesday at Coyote Hills Country Club.",
+  openGraph: {
+    title: "Fullerton Rotary Club — Service Above Self",
+    description:
+      "The Rotary Club of Fullerton has been serving the community since 1924. Join us every Wednesday at Coyote Hills Country Club.",
+    url: "https://www.fullertonrotary.org",
+    siteName: "Fullerton Rotary Club",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fullerton Rotary Club — Service Above Self",
+    description:
+      "The Rotary Club of Fullerton has been serving the community since 1924. Join us every Wednesday at Coyote Hills Country Club.",
+  },
 };
 
 export default async function HomePage() {
@@ -74,8 +89,34 @@ export default async function HomePage() {
     events = [];
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Rotary Club of Fullerton',
+    url: 'https://www.fullertonrotary.org',
+    logo: 'https://www.fullertonrotary.org/rotary-logo.png',
+    description:
+      'The Rotary Club of Fullerton has been serving the community since 1924. We meet every Wednesday at Coyote Hills Country Club.',
+    foundingDate: '1924',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '1440 Bastanchury Rd',
+      addressLocality: 'Fullerton',
+      addressRegion: 'CA',
+      postalCode: '92833',
+      addressCountry: 'US',
+    },
+    sameAs: [
+      'https://www.rotary.org',
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── ANNOUNCEMENT BAR ───────────────────────────────────── */}
       <div className="bg-navy-900 py-2.5 px-4 text-center text-sm">
         <span className="font-bold text-gold-400">Weekly Lunch Meeting</span>
