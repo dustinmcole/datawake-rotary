@@ -392,3 +392,201 @@ export const checkinSessions = pgTable("checkin_sessions", {
   isActive: boolean("is_active").notNull().default(true),
   notes: varchar("notes", { length: 512 }).notNull().default(""),
 });
+
+// ============================================
+// cc_list_mappings — Constant Contact segment → list mapping
+// ============================================
+export const ccListMappings = pgTable("cc_list_mappings", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  segment: varchar("segment", { length: 64 }).notNull().unique(),
+  ccListId: varchar("cc_list_id", { length: 256 }).notNull().default(""),
+  ccListName: varchar("cc_list_name", { length: 256 }).notNull().default(""),
+  enabled: boolean("enabled").notNull().default(true),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// cc_sync_logs — Constant Contact sync history
+// ============================================
+export const ccSyncLogs = pgTable("cc_sync_logs", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  segment: varchar("segment", { length: 64 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull(),
+  recordsSynced: integer("records_synced").notNull().default(0),
+  recordsFailed: integer("records_failed").notNull().default(0),
+  errorMessage: text("error_message"),
+  triggeredBy: varchar("triggered_by", { length: 32 }).notNull().default("manual"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// ============================================
+// cc_config — single-row OAuth + schedule config
+// ============================================
+export const ccConfig = pgTable("cc_config", {
+  id: integer("id").primaryKey().default(1),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  tokenExpiresAt: timestamp("token_expires_at"),
+  connected: boolean("connected").notNull().default(false),
+  syncSchedule: varchar("sync_schedule", { length: 32 }).notNull().default("manual"),
+  fieldMappings: text("field_mappings").notNull().default("{}"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// text_templates — reusable SMS message templates
+// ============================================
+export const textTemplates = pgTable("text_templates", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  name: varchar("name", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  category: varchar("category", { length: 64 }).notNull().default("general"),
+  createdBy: varchar("created_by", { length: 128 }).references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// text_broadcasts — SMS broadcast campaigns
+// ============================================
+export const textBroadcasts = pgTable("text_broadcasts", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  title: varchar("title", { length: 256 }).notNull(),
+  message: text("message").notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("draft"), // draft, scheduled, sending, sent, failed
+  targetGroup: varchar("target_group", { length: 64 }).notNull().default("all"), // all, role:admin, committee:<id>, attendance:recent
+  targetFilter: text("target_filter").notNull().default("{}"), // JSON for extra filter params
+  scheduledAt: timestamp("scheduled_at"),
+  sentAt: timestamp("sent_at"),
+  totalRecipients: integer("total_recipients").notNull().default(0),
+  successCount: integer("success_count").notNull().default(0),
+  failureCount: integer("failure_count").notNull().default(0),
+  createdBy: varchar("created_by", { length: 128 }).references(() => users.id),
+  templateId: varchar("template_id", { length: 128 }).references(() => textTemplates.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// text_broadcast_recipients — per-recipient delivery records
+// ============================================
+export const textBroadcastRecipients = pgTable("text_broadcast_recipients", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  broadcastId: varchar("broadcast_id", { length: 128 }).notNull().references(() => textBroadcasts.id, { onDelete: "cascade" }),
+  userId: varchar("user_id", { length: 128 }).references(() => users.id, { onDelete: "set null" }),
+  phone: varchar("phone", { length: 64 }).notNull(),
+  name: varchar("name", { length: 256 }).notNull().default(""),
+  status: varchar("status", { length: 32 }).notNull().default("pending"), // pending, sent, delivered, failed, opted_out
+  errorMessage: text("error_message"),
+  twilioSid: varchar("twilio_sid", { length: 128 }),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// ============================================
+// text_opt_outs — TCPA-compliant opt-out registry
+// ============================================
+export const textOptOuts = pgTable(
+  "text_opt_outs",
+  {
+    id: varchar("id", { length: 128 }).primaryKey(),
+    phone: varchar("phone", { length: 64 }).notNull(),
+    userId: varchar("user_id", { length: 128 }).references(() => users.id, { onDelete: "set null" }),
+    optedOutAt: timestamp("opted_out_at").notNull().defaultNow(),
+    optedInAt: timestamp("opted_in_at"),
+    optedOutBy: varchar("opted_out_by", { length: 32 }).notNull().default("self"), // self, admin, reply_stop
+    active: boolean("active").notNull().default(true), // true = opted out
+    notes: text("notes").notNull().default(""),
+  },
+  (t) => [unique().on(t.phone)]
+);
+
+// ============================================
+// board_meetings — board governance meetings
+// ============================================
+export const boardMeetings = pgTable("board_meetings", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  title: varchar("title", { length: 512 }).notNull(),
+  date: varchar("date", { length: 16 }).notNull(), // 'YYYY-MM-DD'
+  time: varchar("time", { length: 8 }).notNull().default(""),
+  location: varchar("location", { length: 512 }).notNull().default(""),
+  type: varchar("type", { length: 32 }).notNull().default("regular"), // regular, special, annual
+  status: varchar("status", { length: 32 }).notNull().default("scheduled"), // scheduled, completed, cancelled
+  agenda: text("agenda").notNull().default(""),
+  minutes: text("minutes").notNull().default(""),
+  attendees: text("attendees").notNull().default("[]"), // JSON array of names/ids
+  quorumMet: boolean("quorum_met").notNull().default(false),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// board_resolutions — formal resolutions + voting log
+// ============================================
+export const boardResolutions = pgTable("board_resolutions", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  meetingId: varchar("meeting_id", { length: 128 }).references(() => boardMeetings.id, { onDelete: "set null" }),
+  number: varchar("number", { length: 64 }).notNull().default(""), // e.g. "2025-001"
+  title: varchar("title", { length: 512 }).notNull(),
+  description: text("description").notNull().default(""),
+  date: varchar("date", { length: 16 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("proposed"), // proposed, passed, failed, tabled, withdrawn
+  votesFor: integer("votes_for").notNull().default(0),
+  votesAgainst: integer("votes_against").notNull().default(0),
+  votesAbstain: integer("votes_abstain").notNull().default(0),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// board_documents — document library (bylaws, policies, etc.)
+// ============================================
+export const boardDocuments = pgTable("board_documents", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  title: varchar("title", { length: 512 }).notNull(),
+  category: varchar("category", { length: 64 }).notNull().default("general"), // bylaws, policies, standing_rules, forms, minutes, other
+  description: text("description").notNull().default(""),
+  fileUrl: varchar("file_url", { length: 1024 }).notNull().default(""),
+  version: varchar("version", { length: 64 }).notNull().default("1.0"),
+  effectiveDate: varchar("effective_date", { length: 16 }),
+  uploadedBy: varchar("uploaded_by", { length: 128 }),
+  tags: text("tags").notNull().default("[]"), // JSON array
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// board_action_items — Kanban action tracker
+// ============================================
+export const boardActionItems = pgTable("board_action_items", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  meetingId: varchar("meeting_id", { length: 128 }).references(() => boardMeetings.id, { onDelete: "set null" }),
+  title: varchar("title", { length: 512 }).notNull(),
+  description: text("description").notNull().default(""),
+  assignee: varchar("assignee", { length: 256 }).notNull().default("Unassigned"),
+  status: varchar("status", { length: 32 }).notNull().default("todo"), // todo, in_progress, done, cancelled
+  priority: varchar("priority", { length: 32 }).notNull().default("medium"), // low, medium, high
+  dueDate: varchar("due_date", { length: 16 }),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// officer_terms — officer roles and term history
+// ============================================
+export const officerTerms = pgTable("officer_terms", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  userId: varchar("user_id", { length: 128 }).references(() => users.id, { onDelete: "set null" }),
+  officerName: varchar("officer_name", { length: 256 }).notNull().default(""),
+  role: varchar("role", { length: 128 }).notNull(), // President, VP, Secretary, Treasurer, etc.
+  rotaryYear: varchar("rotary_year", { length: 16 }).notNull(), // e.g. "2025-2026"
+  startDate: varchar("start_date", { length: 16 }).notNull(),
+  endDate: varchar("end_date", { length: 16 }),
+  active: boolean("active").notNull().default(true),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
