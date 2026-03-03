@@ -392,3 +392,93 @@ export const checkinSessions = pgTable("checkin_sessions", {
   isActive: boolean("is_active").notNull().default(true),
   notes: varchar("notes", { length: 512 }).notNull().default(""),
 });
+
+// ============================================
+// board_meetings
+// ============================================
+export const boardMeetings = pgTable("board_meetings", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  title: varchar("title", { length: 512 }).notNull(),
+  date: varchar("date", { length: 16 }).notNull(),
+  time: varchar("time", { length: 8 }).notNull().default(""),
+  location: varchar("location", { length: 512 }).notNull().default(""),
+  type: varchar("type", { length: 32 }).notNull().default("regular"),
+  status: varchar("status", { length: 32 }).notNull().default("scheduled"),
+  agenda: text("agenda").notNull().default(""),
+  minutes: text("minutes").notNull().default(""),
+  attendees: text("attendees").notNull().default("[]"),
+  quorumMet: boolean("quorum_met").notNull().default(false),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// board_resolutions
+// ============================================
+export const boardResolutions = pgTable("board_resolutions", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  meetingId: varchar("meeting_id", { length: 128 }).references(() => boardMeetings.id, { onDelete: "set null" }),
+  number: varchar("number", { length: 64 }).notNull().default(""),
+  title: varchar("title", { length: 512 }).notNull(),
+  description: text("description").notNull().default(""),
+  date: varchar("date", { length: 16 }).notNull(),
+  status: varchar("status", { length: 32 }).notNull().default("proposed"),
+  votesFor: integer("votes_for").notNull().default(0),
+  votesAgainst: integer("votes_against").notNull().default(0),
+  votesAbstain: integer("votes_abstain").notNull().default(0),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// board_documents
+// ============================================
+export const boardDocuments = pgTable("board_documents", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  title: varchar("title", { length: 512 }).notNull(),
+  category: varchar("category", { length: 64 }).notNull().default("general"),
+  description: text("description").notNull().default(""),
+  fileUrl: varchar("file_url", { length: 1024 }).notNull().default(""),
+  version: varchar("version", { length: 64 }).notNull().default("1.0"),
+  effectiveDate: varchar("effective_date", { length: 16 }),
+  uploadedBy: varchar("uploaded_by", { length: 128 }),
+  tags: text("tags").notNull().default("[]"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// board_action_items
+// ============================================
+export const boardActionItems = pgTable("board_action_items", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  meetingId: varchar("meeting_id", { length: 128 }).references(() => boardMeetings.id, { onDelete: "set null" }),
+  title: varchar("title", { length: 512 }).notNull(),
+  description: text("description").notNull().default(""),
+  assignee: varchar("assignee", { length: 256 }).notNull().default("Unassigned"),
+  status: varchar("status", { length: 32 }).notNull().default("todo"),
+  priority: varchar("priority", { length: 32 }).notNull().default("medium"),
+  dueDate: varchar("due_date", { length: 16 }),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// ============================================
+// officer_terms
+// ============================================
+export const officerTerms = pgTable("officer_terms", {
+  id: varchar("id", { length: 128 }).primaryKey(),
+  userId: varchar("user_id", { length: 128 }).references(() => users.id, { onDelete: "set null" }),
+  officerName: varchar("officer_name", { length: 256 }).notNull().default(""),
+  role: varchar("role", { length: 128 }).notNull(),
+  rotaryYear: varchar("rotary_year", { length: 16 }).notNull(),
+  startDate: varchar("start_date", { length: 16 }).notNull(),
+  endDate: varchar("end_date", { length: 16 }),
+  active: boolean("active").notNull().default(true),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
