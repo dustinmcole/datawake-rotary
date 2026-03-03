@@ -62,6 +62,21 @@ export const metadata: Metadata = {
   title: "Fullerton Rotary Club — Service Above Self",
   description:
     "The Rotary Club of Fullerton has been serving the community since 1924. Join us every Wednesday at Coyote Hills Country Club.",
+  openGraph: {
+    title: "Fullerton Rotary Club — Service Above Self",
+    description:
+      "The Rotary Club of Fullerton has been serving the community since 1924. Join us every Wednesday at Coyote Hills Country Club.",
+    url: "https://www.fullertonrotary.org",
+    siteName: "Fullerton Rotary Club",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fullerton Rotary Club — Service Above Self",
+    description:
+      "The Rotary Club of Fullerton has been serving the community since 1924. Join us every Wednesday at Coyote Hills Country Club.",
+  },
 };
 
 export default async function HomePage() {
@@ -339,13 +354,24 @@ export default async function HomePage() {
                 <p className="text-sm text-gray-500 flex-1">
                   Guest speakers, fellowship, and Rotary updates. Guests are always welcome.
                 </p>
-                <Link
-                  href="/contact"
-                  className="mt-5 inline-flex items-center text-sm font-bold text-navy-700 hover:text-gold-600 transition-colors"
-                >
-                  Plan your visit
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                </Link>
+                <div className="mt-5 flex flex-col gap-2">
+                  <a
+                    href="https://maps.google.com/?q=Coyote+Hills+Country+Club+1440+E+Bastanchury+Rd+Fullerton+CA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-sm font-bold text-gold-600 hover:text-gold-700 transition-colors"
+                  >
+                    <MapPin className="mr-1.5 h-3.5 w-3.5" />
+                    View on Google Maps
+                  </a>
+                  <Link
+                    href="/contact"
+                    className="inline-flex items-center text-sm font-bold text-navy-700 hover:text-gold-600 transition-colors"
+                  >
+                    Plan your visit
+                    <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -379,8 +405,8 @@ export default async function HomePage() {
             />
             <ProgramCard
               icon={<GraduationCap className="h-6 w-6" />}
-              title="Youth Programs"
-              description="Scholarships, Interact Clubs, RYLA leadership retreats, and mentorship for Fullerton students."
+              title="Club Service"
+              description="Building fellowship, developing club leadership, and creating a vibrant community where members grow and thrive together."
             />
             <ProgramCard
               icon={<Globe className="h-6 w-6" />}
@@ -463,6 +489,40 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* ── PHOTO GALLERY PREVIEW ──────────────────────────────── */}
+      <section className="bg-navy-50 py-20 sm:py-28">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center mb-12">
+            <span className="text-gold-600 font-bold tracking-widest uppercase text-xs mb-3 block">In the Community</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-navy-900 tracking-tight">Rotary in Action</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+            {[
+              { src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80", alt: "Club members at community service event" },
+              { src: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&q=80", alt: "Team volunteering together" },
+              { src: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&q=80", alt: "Community fundraiser event" },
+              { src: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&q=80", alt: "Helping at local food bank" },
+              { src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80", alt: "Professional networking lunch" },
+              { src: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=600&q=80", alt: "International service project" },
+            ].map((photo, i) => (
+              <div
+                key={i}
+                className={`relative overflow-hidden rounded-2xl bg-navy-200 aspect-square${i === 0 ? " md:col-span-2 md:row-span-2 aspect-square" : ""}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
